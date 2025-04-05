@@ -20,15 +20,25 @@ class OpenParliamentClass
         return self::BASE_URL;
     }
 
+    private function setCacheTimer(){
+        return now()->addDays(7);
+    } 
+
     public function getRepresentatives(){
-        return Cache::remember('open_policy_politicians', now()->addDays(3), function () {
+        return Cache::remember('open_policy_politicians', $this->setCacheTimer(), function () {
             return RequestHandlerClass::makeRequest(self::BASE_URL.'/politicians');
         });
     }
 
-    public function getRepresentative($url){
-        return Cache::remember($url, now()->addDays(3), function () use ($url) {
+    public function getPolicyInformation($url){
+        return Cache::remember($url, $this->setCacheTimer(), function () use ($url) {
             return RequestHandlerClass::makeRequest(self::BASE_URL.$url);
+        });
+    }
+
+    public function getParlCaInformation($url){
+        return Cache::remember($url, $this->setCacheTimer(), function () use ($url) {
+            return RequestHandlerClass::findXmlUrlFromParlPage($url);
         });
     }
 

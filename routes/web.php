@@ -1,5 +1,6 @@
 <?php
 
+use App\Service\v1\BillClass;
 use App\Service\v1\RepresentativeClass;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
@@ -37,7 +38,10 @@ Route::get('/all-database-view/{table}', function ($table) {
 
 Route::get('/testing', function () {
     // return Cache::get('/politicians/ziad-aboultaif/');
-    return $data = (new RepresentativeClass())->searchRepresentative('stephen');
+    $data = dd((new BillClass())->getBillVotes([
+        "/votes/44-1/18/",
+        "/votes/44-1/5/"
+    ]));
 
     
     dd( (new RepresentativeClass())->getRepresentatives($data));

@@ -30,7 +30,7 @@ class RepresentativeClass
     }
 
     public function getRepresentative($url){
-        return $this->openParliamentClass->getRepresentative($url);
+        return $this->openParliamentClass->getPolicyInformation($url);
     }
 
     public function getRepresentativeRecentActivities($data){
