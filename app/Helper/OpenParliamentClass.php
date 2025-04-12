@@ -38,7 +38,13 @@ class OpenParliamentClass
 
     public function getParlCaInformation($url){
         return Cache::remember($url, $this->setCacheTimer(), function () use ($url) {
-            return RequestHandlerClass::findXmlUrlFromParlPage($url);
+            return RequestHandlerClass::readHtmlForSummary($url);
+        });
+    }
+
+    public function getOurCommonsCaInformation($url){
+        return Cache::remember($url, $this->setCacheTimer(), function () use ($url) {
+            return RequestHandlerClass::findXmlUrlFromCommonsPage($url);
         });
     }
 

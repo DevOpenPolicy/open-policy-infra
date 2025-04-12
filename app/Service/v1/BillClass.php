@@ -41,13 +41,7 @@ class BillClass
     }
 
     public function getBillSummary($url){
-        $url = $this->openParliamentClass->getParlCaInformation($url);
-
-        if(!$url) return [];
-
-        $xmlReaderClass = new XmlReaderClass();
-        $formattedXml = $xmlReaderClass->readXml($url);
-        return $formattedXml['Introduction']['Summary']['Provision'];
+        return $this->openParliamentClass->getParlCaInformation($url);
     }
 
     public function getBillVotes($vote_urls = []){

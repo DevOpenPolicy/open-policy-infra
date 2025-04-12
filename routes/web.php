@@ -1,6 +1,8 @@
 <?php
 
 use App\Service\v1\BillClass;
+use App\Service\v1\CommitteeClass;
+use App\Service\v1\DebateClass;
 use App\Service\v1\RepresentativeClass;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
@@ -37,14 +39,9 @@ Route::get('/all-database-view/{table}', function ($table) {
 });
 
 Route::get('/testing', function () {
-    // return Cache::get('/politicians/ziad-aboultaif/');
-    $data = dd((new BillClass())->getBillVotes([
-        "/votes/44-1/18/",
-        "/votes/44-1/5/"
-    ]));
+    dd((new BillClass())->getBillSummary('https://www.parl.ca/legisinfo/en/bill/44-1/C-2'));
 
     
-    dd( (new RepresentativeClass())->getRepresentatives($data));
 });
 
 
