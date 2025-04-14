@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\v1\AuthorizationController;
+use App\Http\Controllers\v1\MP\RepresentativeController;
 use App\Http\Controllers\v1\OneTimePinController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -43,7 +44,20 @@ Route::prefix('admin-auth')->group(function () {
 });
 
 Route::get('/user', function (Request $request) {
-    return Auth::check();
+    // get Authorization key
+    // logger($request->bearerToken());
+    $user = Auth::user();
+
+    $representativeController = new RepresentativeController();
+    $data = $representativeController->checkRepPostalCodeInformationIsCached($user->postal_code);
+
+    return response()->json([
+            'success' => true,
+            'user' => $user,
+            'representative' => $data,
+        ], 200);
+    // delete token
+    // $request->user()->currentAccessToken()->delete();
 })->middleware('auth:sanctum');
 
 

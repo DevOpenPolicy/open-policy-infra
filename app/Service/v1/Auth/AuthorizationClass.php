@@ -2,11 +2,13 @@
 
 namespace App\Service\v1\Auth;
 
+use App\Http\Controllers\v1\MP\RepresentativeController;
 use App\Http\Requests\ForgotPasswordRequest;
 use App\Http\Requests\LoginRequest;
 use App\Http\Requests\RegisterRequest;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Hash;
 
 class AuthorizationClass
@@ -30,10 +32,14 @@ class AuthorizationClass
         $user = User::find(Auth::user()->id);
         $token = $user->createToken('authorization_token')->plainTextToken;
 
+        $representativeController = new RepresentativeController();
+        $data = $representativeController->checkRepPostalCodeInformationIsCached($user->postal_code);
+
         return response()->json([
             'success' => true,
             'token' => $token,
             'user' => $user,
+            'representative' => $data,
             'message' => 'Logged in successfully'
         ]);
         
@@ -53,9 +59,14 @@ class AuthorizationClass
         ]);
 
         $token = $user->createToken('authorization_token')->plainTextToken;
+
+        $representativeController = new RepresentativeController();
+        $data = $representativeController->checkRepPostalCodeInformationIsCached($user->postal_code);
+
         return response()->json([
             'token' => $token,
             'user' => $user,
+            'representative' => $data,
             'success' => true,
             'message' => 'User registered successfully'
         ]);

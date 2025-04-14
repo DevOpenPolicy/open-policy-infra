@@ -39,8 +39,6 @@ class BillController extends Controller
             $type = 1;
         }
 
-        logger($type);
-
         $bills = Cache::remember("bills_page_{$search}_{$type}", now()->addDays(7), function () use ($search, $type) {
             return Bill::select('bills.introduced','bills.short_name','bills.name','bills.number','bills.is_government_bill','politicians.name as politician_name')
                 ->join('politicians', 'bills.politician', '=', 'politicians.politician_url')
@@ -66,7 +64,7 @@ class BillController extends Controller
 
     public function getBillNumber($number){
         $bill = Cache::remember("bill_{$number}", now()->addDays(7), function () use ($number) {
-            $data = Bill::select('bills.*', 'politicians.name as politician_name')
+            $data = Bill::select('bills.*', 'politicians.name as politician_name', 'politicians.id as politician_id')
                 ->join('politicians', 'bills.politician', '=', 'politicians.politician_url')
                 ->where('bills.session', '44-1')
                 ->where('bills.number', $number)
@@ -143,6 +141,17 @@ class BillController extends Controller
         }
 
         $user = Auth::user();
+
+        if(!$user){
+            return response()->json([
+                'success' => true,
+                'bookmark' => false,
+                'vote_cast' => null,
+                'support_percentage' => 0,
+                'data' => $bill
+            ], 200);
+        }
+        
         $bookmark = Cache::remember("users_{$user->id}_bookmark_{$number}", now()->addDays(7), function () use ($bill, $user) {
             return SavedBill::where('bill_url', $bill->bill_url)
             ->where('user_id', $user->id)    
@@ -163,7 +172,7 @@ class BillController extends Controller
             'success' => true,
             'bookmark' => $bookmark ? (bool)$bookmark->is_saved : false,
             'vote_cast' => $votes ? ($votes->is_supported ? 'support' : 'oppose') : null,
-            'support_percentage' => $total_votes->count() > 0 ? (($total_votes->where('is_supported', 1)->count()  / $total_votes->count()) * 100) : 0,
+            'support_percentage' => round($total_votes->count() > 0 ? (($total_votes->where('is_supported', 1)->count()  / $total_votes->count()) * 100) : 0,2),
             'data' => $bill
         ], 200);
     } 
@@ -242,7 +251,7 @@ class BillController extends Controller
 
             return response()->json([
                 'success' => true,
-                'support_percentage' => $percentage,
+                'support_percentage' => round($percentage,2),
                 'vote_cast' => $is_supported ? 'support' : 'oppose',
                 'message' => 'Vote Cast Successfully'
             ], 200);
@@ -255,7 +264,7 @@ class BillController extends Controller
 
         return response()->json([
             'success' => true,
-            'support_percentage' => $percentage,
+            'support_percentage' => round($percentage,2),
             'vote_cast' => $is_supported ? 'support' : 'oppose',
             'message' => 'Vote Cast Successfully'
         ], 200);
