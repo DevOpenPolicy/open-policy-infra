@@ -13,7 +13,8 @@ class AppLinkController extends Controller
 
         return response()->json([
             'success' => true,
-            'data' => 'https://openpolicy.me/',
+            'data' => $link
+            // 'https://openpolicy.me/',
         ]);
     }
 

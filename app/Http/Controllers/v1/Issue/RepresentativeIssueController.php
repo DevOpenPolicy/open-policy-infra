@@ -25,7 +25,8 @@ class RepresentativeIssueController extends Controller
 
     public function requestDeletion(Request $request){
         RepresentativeIssue::where('id', $request->id)->update([
-            'status' => 'pending_deletion'
+            'status' => 'pending_deletion',
+            'deletion_reason' => $request->deletion_reason,
         ]);
 
         return response()->json([

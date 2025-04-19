@@ -31,6 +31,9 @@ class AuthorizationController extends Controller
 
     public function logout_user(Request $request){
         $request->user()->currentAccessToken()->delete();
-        return response()->json(['message' => 'Logged out successfully']);
+        return response()->json([
+            'success' => true,
+            'message' => 'Logged out successfully'
+        ]);
     }
 }

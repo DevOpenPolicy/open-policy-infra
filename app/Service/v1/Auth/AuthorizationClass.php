@@ -26,7 +26,7 @@ class AuthorizationClass
             return response()->json([
                 'success' => false,
                 'message' => 'Invalid credentials'
-            ], 401);
+            ], 402);
         }
 
         $user = User::find(Auth::user()->id);

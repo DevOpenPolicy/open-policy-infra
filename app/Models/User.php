@@ -27,6 +27,9 @@ class User extends Authenticatable
         'age',
         'email',
         'password',
+        'dp',
+        'deleted_at',
+        'account_deletion_reason',
     ];
 
     /**

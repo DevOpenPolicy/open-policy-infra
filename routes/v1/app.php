@@ -5,6 +5,7 @@ use App\Http\Controllers\v1\Bills\BillController;
 use App\Http\Controllers\v1\Chat\ChatController;
 use App\Http\Controllers\v1\Issue\RepresentativeIssueController;
 use App\Http\Controllers\v1\MP\RepresentativeController;
+use App\Http\Controllers\v1\Profile\ProfileController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -39,6 +40,8 @@ Route::prefix('app/v1')->group(function () {
     Route::prefix('bills')->group(function () {
         // get all bills
         Route::get('/', [BillController::class, 'getAllBills']);
+
+        Route::get('/user-bill', [BillController::class, 'userBills'])->middleware(['auth:sanctum']);
         
         // bill details
         Route::get('/show/{number}', [BillController::class, 'getBillNumber'])->middleware(['auth:sanctum']);
@@ -64,14 +67,21 @@ Route::prefix('app/v1')->group(function () {
         Route::get('/committee', [AppLinkController::class, 'committeeActivityLink']);
     });
 
-    Route::prefix('profile')->group(function () {
+    Route::prefix('profile')->middleware(['auth:sanctum'])->group(function () {
         // show users bill information 
+        Route::get('/', [ProfileController::class, 'analytics']);
 
         // change password
+        Route::post('/change-password', [ProfileController::class, 'changePassword']);
+
+        // change postal code
+        Route::post('/postal-code', [ProfileController::class, 'changePostalCode']);
 
         // edit profile
+        Route::post('/update-profile', [ProfileController::class, 'editProfile']);
 
-        // delete account 
+        // delete account
+        Route::post('/delete-account', [ProfileController::class, 'deleteAccount']);
     });
 
     Route::prefix('issue')
@@ -82,6 +92,7 @@ Route::prefix('app/v1')->group(function () {
         
         // delete issue
         Route::post('/delete', [RepresentativeIssueController::class, 'requestDeletion']);
+        
     });
 });
 
