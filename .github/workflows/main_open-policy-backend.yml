@@ -65,4 +65,4 @@ jobs:
           app-name: 'open-policy-backend'
           slot-name: 'Production'
           package: .
-          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_BC874E2667964EC98B4A3FCFD1BF3DB0 }}
+          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_212E5053FCF24EBBA9F1FFB4F39EB6E1 }}
