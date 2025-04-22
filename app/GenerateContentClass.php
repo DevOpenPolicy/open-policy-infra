@@ -78,7 +78,8 @@ class GenerateContentClass
         $openParliamentClass = new OpenParliamentClass();
         foreach ($bills as $bill) {
             try{
-            $bill_information = $openParliamentClass->getPolicyInformation($bill['url']);
+                $bill_information = $openParliamentClass->getPolicyInformation($bill['url']);
+                
 
             $politician = Politicians::where('politician_url',$bill_information['sponsor_politician_url'])->first();
             if(!$politician){
@@ -109,7 +110,8 @@ class GenerateContentClass
                 $bills->politician = $bill_information['sponsor_politician_url'];
                 $bills->bill_url = $bill['url'];
                 $bills->is_government_bill = $is_gov;
-                $bills->bills_json = json_encode($bill_information);
+                $bill['bill_information'] = $bill_information;
+                $bills->bills_json = json_encode($bill);
                 $bills->save();
             }
             
