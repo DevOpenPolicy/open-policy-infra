@@ -12,7 +12,7 @@ Artisan::command('inspire', function () {
 Artisan::command('generate:data', function () {
     $this->comment('started');
     GenerateContentClass::generateMP();
-    GenerateContentClass::generateBill();
+    // GenerateContentClass::generateBill();
     $this->comment('completed');
 })->purpose('Display an inspiring quote')->hourly();
 
