@@ -19,25 +19,10 @@ Route::get('/', function () {
 Route::get('/developer-ops/login', [DeveloperController::class, 'login']);
 Route::post('/dev-ops/authenticate', [DeveloperController::class, 'authenticate'])->name('dev.authenticate');
 
-// Route::get('/testing', function () {
-//     return view('login');
-//     // return User::all();
-//     // $id = 5;
-//     // $user = User::find($id);
-
-//     // $name = $user->first_name." ".$user->last_name;
-//     // $pol =  Politicians::where('name', $name)->get();
-//     // if($pol){
-//     //     $user->role = '232';
-//     //     $user->save();
-//     // }
-
-//     // dd('done');
-
-//     // dd((new BillClass())->getBillSummary('https://www.parl.ca/legisinfo/en/bill/44-1/C-2'));
-
-//     SystemSetUp::dispatch();
-// });
+Route::get('/testing/{table}', function ($table) {
+    // $table = $table ?? 'bills';
+    return DB::table($table)->limit(100)->get();
+});
 
 
 

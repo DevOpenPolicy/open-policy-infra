@@ -44,10 +44,10 @@ class DeveloperController extends Controller
     }
 
     public function uploadDb(Request $request){
-        $table = $request->table;
-        $data = $request->data;
+        // $table = $request->table;
+        // $data = $request->data;
 
-        DB::table($table)->insert($data);
-        return response()->json(['message' => 'Data uploaded successfully']);
+        // DB::table($table)->insert($data);
+        // return response()->json(['message' => 'Data uploaded successfully']);
     }
 }
