@@ -1,5 +1,6 @@
 <?php
 
+use App\Jobs\SystemSetUp;
 use App\Models\Politicians;
 use App\Models\User;
 use App\Service\v1\BillClass;
@@ -14,49 +15,28 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-
-Route::get('/all-database', function () {
-    $query = "
-    SELECT tablename 
-    FROM pg_tables 
-    WHERE schemaname NOT IN ('pg_catalog', 'information_schema') 
-    ORDER BY tablename
-";
-    $tables = DB::select($query);
-    $data = [];
-    foreach ($tables as $table) {
-        
-        $data[] = [$table->tablename, DB::table($table->tablename)->count()];
-        //drop tables that the count is zero
-        // if(DB::table($table->tablename)->count() == 0){
-        //     DB::table($table->tablename)->truncate();
-        // }
-    }
-
-    return $data;
-});
-
 Route::get('/all-database-view/{table}', function ($table) {
     dd(DB::table($table)->limit(10)->orderBy('id','DESC')->get());
 });
 
 Route::get('/testing', function () {
-    return User::all();
-    $id = 5;
-    $user = User::find($id);
+    return view('login');
+    // return User::all();
+    // $id = 5;
+    // $user = User::find($id);
 
-    $name = $user->first_name." ".$user->last_name;
-    $pol =  Politicians::where('name', $name)->get();
-    if($pol){
-        $user->role = '232';
-        $user->save();
-    }
+    // $name = $user->first_name." ".$user->last_name;
+    // $pol =  Politicians::where('name', $name)->get();
+    // if($pol){
+    //     $user->role = '232';
+    //     $user->save();
+    // }
 
-    dd('done');
+    // dd('done');
 
-    dd((new BillClass())->getBillSummary('https://www.parl.ca/legisinfo/en/bill/44-1/C-2'));
+    // dd((new BillClass())->getBillSummary('https://www.parl.ca/legisinfo/en/bill/44-1/C-2'));
 
-    
+    SystemSetUp::dispatch();
 });
 
 
