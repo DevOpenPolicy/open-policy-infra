@@ -2,6 +2,8 @@
 
 use App\Http\Controllers\DeveloperController;
 use App\Jobs\SystemSetUp;
+use App\Models\Bill;
+use App\Models\ParliamentSession;
 use App\Models\Politicians;
 use App\Models\User;
 use App\Service\v1\BillClass;
@@ -22,6 +24,10 @@ Route::post('/dev-ops/authenticate', [DeveloperController::class, 'authenticate'
 Route::get('/testing/{table}', function ($table) {
     // $table = $table ?? 'bills';
     return DB::table($table)->limit(100)->get();
+});
+
+Route::get('/counts', function () {
+    dd(Bill::count(), ParliamentSession::count(), Politicians::count(), User::count());
 });
 
 

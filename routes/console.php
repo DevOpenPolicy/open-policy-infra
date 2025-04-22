@@ -3,13 +3,18 @@
 use App\GenerateContentClass;
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Support\Facades\Artisan;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Http;
 
 Artisan::command('inspire', function () {
     $this->comment(Inspiring::quote());
 })->purpose('Display an inspiring quote')->hourly();
 
+
+Artisan::command('generate:data', function () {
+    $this->comment('started');
+    GenerateContentClass::generateMP();
+    GenerateContentClass::generateBill();
+    $this->comment('completed');
+})->purpose('Display an inspiring quote')->hourly();
 
 Artisan::command('upload:data', function () {
     // $tables = ['bills','parliament_sessions','politicians'];
