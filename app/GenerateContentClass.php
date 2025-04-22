@@ -109,7 +109,7 @@ class GenerateContentClass
                 $bills->politician = $bill_information['sponsor_politician_url'];
                 $bills->bill_url = $bill['url'];
                 $bills->is_government_bill = $is_gov;
-                $bills->bills_json = json_encode($bill);
+                $bills->bills_json = json_encode($bill_information);
                 $bills->save();
             }
             
