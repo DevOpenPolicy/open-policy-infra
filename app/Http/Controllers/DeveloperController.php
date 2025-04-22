@@ -10,15 +10,9 @@ class DeveloperController extends Controller
 {
     public function login()
     {
-        User::create([
-            'first_name' => 'admin',
-            'last_name' => 'admin',
-            'email' => 'devops@open_policy.com',
-            'password' => bcrypt('123456789!@$asdf'),
-            'role' => '9908',
-            'phone' => '08162076900',
-            'postal_code' => '10001',
-        ]);
+        if(Auth::check()){
+            return redirect()->intended('/log-viewer');
+        }
         return view('login');
     }
 
