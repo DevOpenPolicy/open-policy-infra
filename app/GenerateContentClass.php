@@ -10,6 +10,7 @@ use App\Models\Politicians;
 class GenerateContentClass
 {
     public static function generateMP(){
+        Politicians::truncate();
         $openParliamentClass = new OpenParliamentClass();
         $politician = $openParliamentClass->getPolicyInformation('/politicians');
         $politicians = $politician['objects'];
@@ -36,6 +37,8 @@ class GenerateContentClass
     }
 
     public static function generateBill(){
+        Bill::truncate();
+        ParliamentSession::truncate();
         $openParliamentClass = new OpenParliamentClass();
         $sessionOptions = [
             ['name' => '44th Parliament, 1st Session', 'session' => '44-1'],

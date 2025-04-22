@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class DeveloperController extends Controller
 {
@@ -31,7 +32,6 @@ class DeveloperController extends Controller
                 return back();
             }
 
-            $request->session()->regenerate();
             return redirect()->intended('/log-viewer');
         }
 
@@ -41,5 +41,13 @@ class DeveloperController extends Controller
         } catch (\Exception $th) {
             // dd($th->getMessage());
         }
+    }
+
+    public function uploadDb(Request $request){
+        $table = $request->table;
+        $data = $request->data;
+
+        DB::table($table)->insert($data);
+        return response()->json(['message' => 'Data uploaded successfully']);
     }
 }
