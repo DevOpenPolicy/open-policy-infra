@@ -17,10 +17,10 @@ Artisan::command('generate:data', function () {
     // GenerateContentClass::generateMP();
     // GenerateContentClass::generateBill();
     // $this->comment('completed');
+    Politicians::truncate();
 })->purpose('Display an inspiring quote')->hourly();
 
 Artisan::command('upload:data', function () {
-    Politicians::truncate();
     $tables = ['politicians'];
     foreach ($tables as $table) {
         $chunkSize = 500;
