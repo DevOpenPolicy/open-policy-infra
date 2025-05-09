@@ -73,15 +73,25 @@ class AuthorizationClass
     }
 
     public function forgot_password(ForgotPasswordRequest $forgot_password_request){
-        if ($forgot_password_request->user_route == 'email') {
-            $user = User::where('email', $forgot_password_request->email)->first();
-        }elseif ($forgot_password_request->user_route == 'phone') {
-            $user = User::where('phone', $forgot_password_request->phone)->first();
-        }
-        //! other logic hee
+        $user = User::where('email', $forgot_password_request->user)
+            ->orWhere('phone', $forgot_password_request->user)
+            ->first();
 
         $user->update([
             'password' => Hash::make($forgot_password_request->password)
+        ]);
+
+        $token = $user->createToken('authorization_token')->plainTextToken;
+
+        $representativeController = new RepresentativeController();
+        $data = $representativeController->checkRepPostalCodeInformationIsCached($user->postal_code);
+
+        return response()->json([
+            'token' => $token,
+            'user' => $user,
+            'representative' => $data,
+            'success' => true,
+            'message' => 'password set successfully'
         ]);
     }
 }

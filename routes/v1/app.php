@@ -84,6 +84,7 @@ Route::prefix('app/v1')->group(function () {
         Route::post('/delete-account', [ProfileController::class, 'deleteAccount']);
     });
 
+    
     Route::prefix('issue')
     ->middleware(['auth:sanctum'])
     ->group(function () {

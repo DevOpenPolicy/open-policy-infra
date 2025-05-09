@@ -11,6 +11,10 @@ Route::prefix('app-auth')->group(function () {
     Route::controller(AuthorizationController::class)->group(function () {
         Route::post('/login', 'login_user');
         Route::post('/register', 'register_user');
+        Route::post('/check-email', 'check_email');
+        Route::post('/check-phone-postal', 'check_phone_postal');
+        Route::post('/check-forgotten-email', 'check_forgotten_email');
+        Route::post('/forgot-password', 'forgot_password');
         Route::post('/logout', 'logout_user')->middleware(['auth:sanctum']);
     });
 
@@ -19,9 +23,9 @@ Route::prefix('app-auth')->group(function () {
         Route::post('/verify', 'verifyOtp');
     });
 
-    Route::prefix('forgot')->controller(OneTimePinController::class)->group(function () {
-        Route::post('/send', 'sendOtp');
-    });
+    // Route::prefix('forgot')->controller(OneTimePinController::class)->group(function () {
+    //     Route::post('/send', 'sendOtp');
+    // });
 });
 
 

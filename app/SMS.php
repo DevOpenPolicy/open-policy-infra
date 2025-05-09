@@ -3,10 +3,11 @@
 namespace App;
 
 use GuzzleHttp\Client;
+use Twilio\Rest\Client as TwilioRestClient;
 
 class SMS
 {
-    public static function send(array $phoneNumbers, string $message)
+    public static function azure_send(array $phoneNumbers, string $message)
     {
         $body = [
             'from' => config("azure.sms_phone_number"),
@@ -40,5 +41,28 @@ class SMS
             'json' => $body
         ]);
 
+    }
+
+    public static function twilio_send(string $phoneNumber, string $message)
+    {
+        try{
+            $twilio_client = new TwilioRestClient(
+                config('services.twilio.sid'),
+                config('services.twilio.token')
+            );
+
+            $twilio_client->messages->create($phoneNumber, [
+                'from' => config('services.twilio.from'),
+                'body' => $message,
+            ]);
+        }catch (\Exception $e){
+            // return response()->json([
+            //     'success' => false,
+            //     'message' => 'Failed to send SMS',
+            //     'error' => $e->getMessage()
+            // ], 500);
+        }
+
+        return true;
     }
 }
