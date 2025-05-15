@@ -34,8 +34,8 @@ Route::get('/testing/{table}', function ($table) {
     // return DB::table($table)->limit(100)->get();
 });
 Route::get('/counts', function () {
-    SetupSystem::dispatch();
-    dd('done');
+    // SetupSystem::dispatch();
+    // dd('done');
 });
 
 
