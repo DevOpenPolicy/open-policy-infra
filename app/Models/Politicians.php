@@ -20,4 +20,5 @@ class Politicians extends Model
         'politician_image',
         'politician_json',
     ];
+    
 }

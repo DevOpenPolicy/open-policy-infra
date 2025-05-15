@@ -16,22 +16,26 @@ class GenerateContentClass
         $politicians = $politician['objects'];
 
         foreach ($politicians as $key => $value) {
+            try{
             $data = $openParliamentClass->getPolicyInformation($value['url']);
 
             $politician_store = new Politicians();
             $politician_store->name = $data['name'];
-            $politician_store->constituency_offices = $data['other_info']['constituency_offices'][0];
-            $politician_store->email = $data['email'];
-            $politician_store->voice = $data['voice'];
-            $politician_store->party_name = $data['memberships'][0]['party']['name']['en'];
-            $politician_store->party_short_name = $data['memberships'][0]['party']['short_name']['en'];
-            $politician_store->province_name = $data['memberships'][0]['label']['en'];
-            $politician_store->province_location = $data['memberships'][0]['riding']['name']['en'];
-            $politician_store->province_short_name = $data['memberships'][0]['riding']['province'];
+            $politician_store->constituency_offices = $data['other_info']['constituency_offices'][0] ?? '';
+            $politician_store->email = $data['email'] ?? '';
+            $politician_store->voice = $data['voice'] ?? '';
+            $politician_store->party_name = $data['memberships'][0]['party']['name']['en'] ?? '';
+            $politician_store->party_short_name = $data['memberships'][0]['party']['short_name']['en'] ?? ''; 
+            $politician_store->province_name = $data['memberships'][0]['label']['en'] ?? '';
+            $politician_store->province_location = $data['memberships'][0]['riding']['name']['en'] ?? '';
+            $politician_store->province_short_name = $data['memberships'][0]['riding']['province'] ?? '';
             $politician_store->politician_url = $data['url'];
             $politician_store->politician_image = 'https://openparliament.ca'.$data['image'];
             $politician_store->politician_json = json_encode($data);
             $politician_store->save();
+            } catch(\Exception $e){
+                dd($data, $e->getMessage());
+            }
         }
         return Politicians::all();
     }
@@ -86,14 +90,14 @@ class GenerateContentClass
                 $data = $openParliamentClass->getPolicyInformation($bill_information['sponsor_politician_url']);
                 $politician_store = new Politicians();
                 $politician_store->name = $data['name'];
-                $politician_store->constituency_offices = $data['other_info']['constituency_offices'][0];
-                $politician_store->email = $data['email'];
-                $politician_store->voice = $data['voice'];
-                $politician_store->party_name = $data['memberships'][0]['party']['name']['en'];
-                $politician_store->party_short_name = $data['memberships'][0]['party']['short_name']['en'];
-                $politician_store->province_name = $data['memberships'][0]['label']['en'];
-                $politician_store->province_location = $data['memberships'][0]['riding']['name']['en'];
-                $politician_store->province_short_name = $data['memberships'][0]['riding']['province'];
+                $politician_store->constituency_offices = $data['other_info']['constituency_offices'][0] ?? '';
+                $politician_store->email = $data['email'] ?? '';
+                $politician_store->voice = $data['voice'] ?? '';
+                $politician_store->party_name = $data['memberships'][0]['party']['name']['en'] ?? '';
+                $politician_store->party_short_name = $data['memberships'][0]['party']['short_name']['en'] ?? ''; 
+                $politician_store->province_name = $data['memberships'][0]['label']['en'] ?? '';
+                $politician_store->province_location = $data['memberships'][0]['riding']['name']['en'] ?? '';
+                $politician_store->province_short_name = $data['memberships'][0]['riding']['province'] ?? '';
                 $politician_store->politician_url = $data['url'];
                 $politician_store->politician_image = 'https://openparliament.ca'.$data['image'];
                 $politician_store->politician_json = json_encode($data);

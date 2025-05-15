@@ -106,7 +106,6 @@ class RepresentativeController extends Controller
                 ->where(function ($query) use ($search) {
                     $query->where('name', 'like', '%' . $search . '%');
                 })
-
                 ->get();
         });
 
