@@ -43,7 +43,7 @@ class BillController extends Controller
 
         $bills = Cache::remember("bills_page_{$search}_{$type}", now()->addDays(7), function () use ($search, $type) {
             return Bill::select('bills.introduced', 'bills.short_name', 'bills.name', 'bills.number', 'bills.is_government_bill', 'politicians.name as politician_name')
-                ->join('politicians', 'bills.politician', ' =', 'politicians.politician_url')
+                ->join('politicians', 'bills.politician', '=', 'politicians.politician_url')
                 ->where('bills.session', '44-1')
                 ->whereNotIn('bills.number', ['c-1', 's-1'])
                 ->where(function ($query) use ($search) {
