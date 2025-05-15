@@ -12,12 +12,12 @@ Artisan::command('inspire', function () {
 })->purpose('Display an inspiring quote')->hourly();
 
 
-// Artisan::command('generate:data', function () {
-//     $this->comment('started');
-//     // GenerateContentClass::generateMP();
-//     GenerateContentClass::generateBill();
-//     $this->comment('completed');
-// })->purpose('Display an inspiring quote')->hourly();
+Artisan::command('generate:data', function () {
+    $this->comment('started');
+    GenerateContentClass::generateMP();
+    GenerateContentClass::generateBill();
+    $this->comment('completed');
+})->purpose('Display an inspiring quote')->hourly();
 
 // Artisan::command('upload:data', function () {
 //     $tables = ['politicians'];
