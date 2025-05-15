@@ -71,7 +71,7 @@ class OpenParliamentClass
             $crawler->filter('.statement_browser')->each(function (Crawler $node) use (&$data, $politicians) {
                 $profileAnchor = null;
                 $profileImage = null;
-            
+
                 $node->filter('a')->each(function (Crawler $aNode) use (&$profileAnchor, &$profileImage) {
                     if ($aNode->filter('img')->count()) {
                         $profileAnchor = $aNode;
@@ -87,27 +87,44 @@ class OpenParliamentClass
                     ? $node->filter('.division.procedural a')->text()
                     : "";
 
-                // $vote_button =($vote_url && $vote_text) ?  "\n<Link href='$vote_url' classname='text-blue-600 hover:underline'>$vote_text</Link>" : "";
-                $vote_button =($vote_url && $vote_text) ?  "\n<Link href='#' classname='text-blue-600 hover:underline'>$vote_text</Link>" : "";
-            
-                $profileHref = $profileAnchor ? $politicians->where('politician_url',$profileAnchor->attr('href'))->first()?->id : "";
+                $vote_button = ($vote_url && $vote_text)
+                    ? "\n<Link href='#' classname='text-blue-600 hover:underline'>$vote_text</Link>"
+                    : "";
+
+                $profileHref = $profileAnchor
+                    ? $politicians->where('politician_url', $profileAnchor->attr('href'))->first()?->id
+                    : "";
 
                 $statement = $node->filter('.text p')->each(function ($p) {
                     return $p->html();
                 });
-                
+
                 $statement = convertAnchorsToReactLinks(implode("<br><br>", $statement));
-                // $statement = convertAnchorsToReactLinks($statement);
-            
+
+                // Extract main topic and subtopics
+                $mainTopic = "";
+                $subTopics = [];
+
+                $mainTopic = $node->filter('.statement_topic')->count() ? $node->filter('.statement_topic')->text() : '';
+
+                $subTopics = [];
+                if ($node->filter('.statement_topic')->count()) {
+                    $statementParent = $node->filter('.statement_topic')->ancestors()->first();
+                    $subTopics = $statementParent->filter('span.br')->each(function ($brNode) {
+                        return trim($brNode->getNode(0)->nextSibling->textContent ?? '');
+                    });
+                }
+
                 $data[] = [
-                    'name'        => $node->filter('.pol_name')->count() ? $node->filter('.pol_name')->text() : "",
-                    'party'       => $node->filter('.partytag')->count() ? $node->filter('.partytag')->text() : "",
-                    'riding'      => $node->filter('.pol_affil')->count() ? $node->filter('.pol_affil')->text() : "",
-                    'statement' => $statement."".$vote_button,
-                    'topic'       => $node->filter('.statement_topic')->count() ? $node->filter('.statement_topic')->text() : "",
-                    'datetime'    => $node->filter('.statement_time_permalink')->count() ? $node->filter('.statement_time_permalink')->text() : "",
-                    'profile_url'  => $profileHref ?  "/mps/".$profileHref : "",
-                    'image'        => $profileImage ?  "https://openparliament.ca".$profileImage : "",
+                    'name'         => $node->filter('.pol_name')->count() ? $node->filter('.pol_name')->text() : "",
+                    'party'        => $node->filter('.partytag')->count() ? $node->filter('.partytag')->text() : "",
+                    'riding'       => $node->filter('.pol_affil')->count() ? $node->filter('.pol_affil')->text() : "",
+                    'statement'    => $statement . $vote_button,
+                    'topic'        => $mainTopic,
+                    'sub_topics'   => implode(' ', array_filter($subTopics)),
+                    'datetime'     => $node->filter('.statement_time_permalink')->count() ? $node->filter('.statement_time_permalink')->text() : "",
+                    'profile_url'  => $profileHref ? "/mps/" . $profileHref : "",
+                    'image'        => $profileImage ? "https://openparliament.ca" . $profileImage : "",
                 ];
             });
 

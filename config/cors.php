@@ -19,10 +19,7 @@ return [
 
     'allowed_methods' => ['*'],
 
-    'allowed_origins' => [
-        'https://app.openpolicy.me',
-        // 'https://your-second-domain.com'  // Replace with your second domain
-    ],
+    'allowed_origins' => ['*'],
 
     'allowed_origins_patterns' => [],
 
