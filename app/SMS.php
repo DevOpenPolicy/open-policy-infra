@@ -43,7 +43,26 @@ class SMS
 
     }
 
-    public static function twilio_send(string $phoneNumber, string $message)
+    public static function twilio_send(string $phoneNumber)
+    {
+        try{
+            $twilio_client = new TwilioRestClient(
+                config('services.twilio.sid'),
+                config('services.twilio.token')
+            );
+            $twilio_client->verify->v2->services(config('services.twilio.verify_service'))
+                            ->verifications
+                            ->create($phoneNumber, "sms");
+
+        }catch (\Exception $e){
+            logger($e->getMessage());
+            return false;
+        }
+
+        return true;
+    }
+
+    public static function twilio_verify(string $phoneNumber, string $code)
     {
         try{
             $twilio_client = new TwilioRestClient(
@@ -51,16 +70,17 @@ class SMS
                 config('services.twilio.token')
             );
 
-            $twilio_client->messages->create($phoneNumber, [
-                'from' => config('services.twilio.from'),
-                'body' => $message,
-            ]);
+            $verification_check = $twilio_client->verify->v2->services(config('services.twilio.verify_service'))
+                ->verificationChecks
+                ->create([
+                            "to" => $phoneNumber,
+                            "code" => $code
+                        ]
+                    );
+            return $verification_check->status == 'approved';
         }catch (\Exception $e){
-            // return response()->json([
-            //     'success' => false,
-            //     'message' => 'Failed to send SMS',
-            //     'error' => $e->getMessage()
-            // ], 500);
+            logger($e->getMessage());
+            return false;
         }
 
         return true;

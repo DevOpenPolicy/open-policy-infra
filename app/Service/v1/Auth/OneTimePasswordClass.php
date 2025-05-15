@@ -35,16 +35,14 @@ class OneTimePasswordClass
     }
 
     private function sendSmsOneTimePassword($phone){
-        Otp::where('phone', $phone)->delete();
-        $otp = rand(1000, 9999);
-        SMS::twilio_send($phone, "Your OTP is $otp. Please use this to verify your account.");
-
-        $otp_data = new Otp();
-        $otp_data->phone = $phone;
-        $otp_data->otp = $otp;
-        $otp_data->expires_at = now()->addMinutes(15);
-        $otp_data->save();
+        $data = SMS::twilio_send($phone);
         
+        if(!$data){
+            return response()->json([
+                'success' => false,
+                'message' =>  'Error Sending OTP, try again',
+            ]); 
+        }
         return response()->json([
             'success' => true,
             'message' => 'OTP sent successfully',
@@ -52,26 +50,14 @@ class OneTimePasswordClass
     }
 
     private function verifySmsOneTimePassword($phone, $code){
-        $otp = Otp::where('phone', $phone)
-            ->where('otp', $code)
-            ->first();
+        $data = SMS::twilio_verify($phone, $code);
 
-        if(!$otp){
+        if(!$data){
             return response()->json([
                 'success' => false,
-                'message' => 'OTP is invalid',
-            ]);
+                'message' =>  'Wrong OTP',
+            ]); 
         }
-
-        if($otp->expires_at < now()){
-            return response()->json([
-                'success' => false,
-                'message' => 'OTP has expired',
-            ]);
-        }
-
-        $otp->delete();
-
         return response()->json([
             'success' => true,
             'message' => 'OTP verified successfully',
