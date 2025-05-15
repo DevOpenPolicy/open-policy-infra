@@ -47,9 +47,9 @@ class RepresentativeController extends Controller
             $data->name = $representative['name'];
             $data->role = $this->representativeClass->getRepresentativesRole($representative);
             $data->image = $this->representativeClass->getRepresentativesImage($representative);
-            $data->email = $representative['email'];
-            $data->phone = $representative['voice'];
-            $data->office = $this->representativeClass->getRepresentativeAddress($representative['other_info']['constituency_offices'][0]);
+            $data->email = $representative['email'] ?? '';
+            $data->phone = $representative['voice'] ?? '';
+            $data->office = $this->representativeClass->getRepresentativeAddress($representative['other_info']['constituency_offices'][0] ?? '');
             $recent_activities = $this->representativeClass->getRepresentativeRecentActivities($representative);
 
             $vote_activity = [];
