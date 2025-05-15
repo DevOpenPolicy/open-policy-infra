@@ -3,6 +3,7 @@
 use App\GenerateContentClass;
 use App\Helper\OpenParliamentClass;
 use App\Http\Controllers\DeveloperController;
+use App\Jobs\SetupSystem;
 use App\Jobs\SystemSetUp;
 use App\Models\Bill;
 use App\Models\Committee;
@@ -33,7 +34,8 @@ Route::get('/testing/{table}', function ($table) {
     // return DB::table($table)->limit(100)->get();
 });
 Route::get('/counts', function () {
-    
+    SetupSystem::dispatch();
+    dd('done');
 });
 
 
