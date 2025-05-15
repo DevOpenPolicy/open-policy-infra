@@ -43,7 +43,7 @@ class RepresentativeClass
         $url = $this->openParliamentClass->getBaseUrl() . $data['related']['activity_rss_url'];
         $formattedXml = $xmlReaderClass->readXml($url);
 
-        return $formattedXml['channel']['item'];
+        return $formattedXml['channel']['item'] ?? [];
     }
 
     public function searchRepresentative($name)

@@ -103,6 +103,7 @@ class RepresentativeController extends Controller
 
         $data = Cache::remember("search_representative_by_{$search}", now()->addDays(7), function () use ($search) {
             return Politicians::select('name', 'province_name', 'id')
+                ->where('is_former',false)
                 ->where(function ($query) use ($search) {
                     $query->where('name', 'like', '%' . $search . '%');
                 })
@@ -126,17 +127,17 @@ class RepresentativeController extends Controller
         $id = request('id');
         $data = Cache::remember("get_representative by_id_{$id}", now()->addDays(7), function () use ($id) {
 
-            $politician = Politicians::select('politician_json')->where('id', $id)->first();
+            $politician = Politicians::where('id', $id)->first();
             $representative = json_decode($politician->politician_json, true);
 
 
             $data = new \stdClass();
-            $data->name = $representative['name'];
-            $data->role = $this->representativeClass->getRepresentativesRole($representative);
-            $data->office = $this->representativeClass->getRepresentativeAddress($representative['other_info']['constituency_offices'][0]);
-            $data->image = $this->representativeClass->getRepresentativesImage($representative);
-            $data->email = $representative['email'];
-            $data->phone = $representative['voice'];
+            $data->name = $politician->name;
+            $data->role = $politician->province_name;
+            $data->office = $this->representativeClass->getRepresentativeAddress($politician->constituency_offices);
+            $data->image = $politician->politician_image;
+            $data->email = $politician->email;
+            $data->phone = $politician->voice;
             $recent_activities = $this->representativeClass->getRepresentativeRecentActivities($representative);
 
             $vote_activity = [];

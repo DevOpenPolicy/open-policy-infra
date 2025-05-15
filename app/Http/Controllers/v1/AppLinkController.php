@@ -11,9 +11,16 @@ class AppLinkController extends Controller
     {
         $link = request('link');
 
+        if (array_filter(['bills', 'debate', 'committees'], fn($keyword) => str_contains($link, $keyword))) {
+            return response()->json([
+                'success' => true,
+                'data' => "https://app.openpolicy.me/$link",
+            ]);
+        }
+
         return response()->json([
             'success' => true,
-            'data' => 'https://openpolicy.me/',
+            'data' => "https://openpolicy.me",
         ]);
     }
 
@@ -23,23 +30,23 @@ class AppLinkController extends Controller
         if ($type === 'debates_this_month') {
             return response()->json([
                 'success' => true,
-                'data' => 'https://openpolicy.me/',
+                'data' => 'https://app.openpolicy.me/debates',
             ]);
         } elseif ($type === 'debates_past') {
             return response()->json([
                 'success' => true,
-                'data' => 'https://openpolicy.me/',
+                'data' => 'https://app.openpolicy.me/debates',
             ]);
         } elseif ($type === 'debates_past') {
             return response()->json([
                 'success' => true,
-                'data' => 'https://openpolicy.me/',
+                'data' => 'https://app.openpolicy.me/debates',
             ]);
         }
 
         return response()->json([
             'success' => true,
-            'data' => 'https://openpolicy.me/',
+            'data' => 'https://app.openpolicy.me/debates',
         ]);
     }
 
@@ -49,18 +56,18 @@ class AppLinkController extends Controller
         if ($type === 'current_committees') {
             return response()->json([
                 'success' => true,
-                'data' => 'https://openpolicy.me/',
+                'data' => 'https://app.openpolicy.me/committees',
             ]);
         } elseif ($type === 'recent_studies') {
             return response()->json([
                 'success' => true,
-                'data' => 'https://openpolicy.me/',
+                'data' => 'https://app.openpolicy.me/committees',
             ]);
         } 
 
         return response()->json([
             'success' => true,
-            'data' => 'https://openpolicy.me/',
+            'data' => 'https://app.openpolicy.me/committees',
         ]);
     }
 }
