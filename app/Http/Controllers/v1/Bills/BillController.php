@@ -41,8 +41,8 @@ class BillController extends Controller
             $type = 1;
         }
 
-        $bills = Cache::remember("bills_page_{$search}_{$type}", now()->addDays(7), function () use ($search, $type) {
-            return Bill::select('bills.introduced', 'bills.short_name', 'bills.name', 'bills.number', 'bills.is_government_bill', 'politicians.name as politician_name')
+        $bills = Cache::remember("app_bills_page_{$search}_{$type}", now()->addDays(7), function () use ($search, $type) {
+            return Bill::select('bills.id','bills.introduced', 'bills.short_name', 'bills.name', 'bills.number', 'bills.is_government_bill', 'politicians.name as politician_name')
                 ->join('politicians', 'bills.politician', '=', 'politicians.politician_url')
                 ->where('bills.session', '44-1')
                 ->whereNotIn('bills.number', ['c-1', 's-1'])
@@ -139,8 +139,12 @@ class BillController extends Controller
 
     public function getBillNumber($number)
     {
-        $bill = Cache::remember("bill_{$number}", now()->addDays(7), function () use ($number) {
-            $data = Bill::select('bills.*', 'politicians.name as politician_name', 'politicians.id as politician_id')->join('politicians', 'bills.politician', '=', 'politicians.politician_url')->where('bills.session', '44-1')->where('bills.number', $number)->first();
+        $bill = Cache::remember("app_bill_{$number}", now()->addDays(7), function () use ($number) {
+            $data = Bill::select('bills.*', 'politicians.name as politician_name', 'politicians.id as politician_id')
+                ->join('politicians', 'bills.politician', '=', 'politicians.politician_url')
+                ->where('bills.session', '44-1')
+                ->where('bills.id', $number)
+                ->first();
 
             if (!$data) {
                 return null;
