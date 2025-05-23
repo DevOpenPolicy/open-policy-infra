@@ -35,7 +35,7 @@ class OneTimePasswordClass
     }
 
     private function sendSmsOneTimePassword($phone){
-        $data = SMS::twilio_send($phone);
+        $data = SMS::twilio_send('+1'.$phone);
         
         if(!$data){
             return response()->json([
@@ -50,7 +50,7 @@ class OneTimePasswordClass
     }
 
     private function verifySmsOneTimePassword($phone, $code){
-        $data = SMS::twilio_verify($phone, $code);
+        $data = SMS::twilio_verify('+1'.$phone, $code);
 
         if(!$data){
             return response()->json([
