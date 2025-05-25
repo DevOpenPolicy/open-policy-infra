@@ -34,7 +34,7 @@ class OneTimePasswordClass
         }
     }
 
-    private function sendSmsOneTimePassword($phone){
+    public function sendSmsOneTimePassword($phone){
         $data = SMS::twilio_send('+1'.$phone);
         
         if(!$data){

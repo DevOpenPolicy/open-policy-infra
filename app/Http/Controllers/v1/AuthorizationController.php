@@ -10,6 +10,7 @@ use App\Http\Requests\RegisterRequest;
 use App\Models\Otp;
 use App\Models\User;
 use App\Service\v1\Auth\AuthorizationClass;
+use App\Service\v1\Auth\OneTimePasswordClass;
 use App\SMS;
 use Illuminate\Http\Request;
 
@@ -166,21 +167,24 @@ class AuthorizationController extends Controller
             ], 400);
         }
 
-        Otp::where('phone', $request->phone)->delete();
-        $otp = rand(1000, 9999);
-        SMS::twilio_send($request->phone, "Your OTP is $otp. Please use this to verify your account.");
+        $oneTimePasswordClass = new OneTimePasswordClass();
+        return $oneTimePasswordClass->sendSmsOneTimePassword($request->phone);
+        
+        // Otp::where('phone', $request->phone)->delete();
+        // $otp = rand(1000, 9999);
+        // SMS::twilio_send($request->phone, "Your OTP is $otp. Please use this to verify your account.");
 
-        $otp_data = new Otp();
-        $otp_data->phone = $request->phone;
-        $otp_data->otp = $otp;
-        $otp_data->expires_at = now()->addMinutes(15);
-        $otp_data->save();
+        // $otp_data = new Otp();
+        // $otp_data->phone = $request->phone;
+        // $otp_data->otp = $otp;
+        // $otp_data->expires_at = now()->addMinutes(15);
+        // $otp_data->save();
 
-        return response()->json([
-            'success' => true,
-            'message' => 'OTP sent successfully',
-            'can_proceed' => true
-        ], 200);
+        // return response()->json([
+        //     'success' => true,
+        //     'message' => 'OTP sent successfully',
+        //     'can_proceed' => true
+        // ], 200);
     }
 
     public function logout_user(Request $request){
