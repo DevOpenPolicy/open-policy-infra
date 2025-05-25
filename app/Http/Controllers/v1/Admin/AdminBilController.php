@@ -45,6 +45,7 @@ class AdminBilController extends Controller
         )
         ->orderBy('supported_count', 'desc')
         ->orderBy('opposed_count', 'desc')  
+        ->orderBy('bills.id', 'asc')
         ->paginate(10);
 
         return response()->json([
