@@ -55,8 +55,8 @@ class AdminIssueController extends Controller
                 'users.first_name',
                 'users.last_name'
             )
-            ->orderBy('supported_count', 'desc')
-            ->orderBy('opposed_count', 'desc')
+            // ->orderBy('supported_count', 'desc')
+            // ->orderBy('opposed_count', 'desc')
             ->orderBy('representative_issues.id', 'asc')
             ->paginate(10);
 
