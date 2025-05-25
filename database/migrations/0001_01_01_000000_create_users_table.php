@@ -1,5 +1,6 @@
 <?php
 
+use App\RoleManager;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -23,7 +24,7 @@ return new class extends Migration
             $table->string('password');
             $table->timestamp('email_verified_at')->nullable();
             $table->timestamp('phone_verified_at')->nullable();
-            $table->string('role')->default(111);
+            $table->string('role')->default(RoleManager::USER);
             $table->rememberToken();
             $table->timestamps();
         });

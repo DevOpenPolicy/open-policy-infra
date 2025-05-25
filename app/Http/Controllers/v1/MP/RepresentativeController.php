@@ -9,6 +9,7 @@ use App\Models\Politicians;
 use App\Models\RepresentativeIssue;
 use App\Models\SavedIssue;
 use App\Models\User;
+use App\RoleManager;
 use App\Service\v1\RepresentativeClass;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -76,15 +77,16 @@ class RepresentativeController extends Controller
             $names = explode(' ', $representative['name']);
 
             $data->issues = RepresentativeIssue::join('users', 'representative_issues.representative_id', '=', 'users.id')
+                ->where('representative_issues.status','approved')
                 ->select('representative_issues.name', 'representative_issues.summary', 'representative_issues.created_at as date', 'representative_issues.id')
                 ->where(function ($query) use ($names) {
                     if (count($names) === 2) {
                         $query->where('users.first_name', 'LIKE', '%' . $names[0] . '%')->where('users.last_name', 'LIKE', '%' . $names[1] . '%');
                     } else {
-                        $query->where('users.first_name', 'LIKE', '%' . $names[0] . '%')->orWhere('users.last_name', 'LIKE', '%' . $names[0] . '%');
+                        $query->where('users.first_name', 'LIKE', '%' . $names . '%')->orWhere('users.last_name', 'LIKE', '%' . $names . '%');
                     }
                 })
-                ->where('users.role', 232)
+                ->where('users.role', RoleManager::REPRESENTATIVE)
                 ->get();
 
             return $data;
@@ -163,6 +165,7 @@ class RepresentativeController extends Controller
             $names = explode(' ', $representative['name']);
 
             $data->issues = RepresentativeIssue::join('users', 'representative_issues.representative_id', '=', 'users.id')
+                ->where('representative_issues.status','approved')
                 ->select('representative_issues.name', 'representative_issues.summary', 'representative_issues.created_at as date', 'representative_issues.id')
                 ->where(function ($query) use ($names) {
                     if (count($names) === 2) {
@@ -171,7 +174,7 @@ class RepresentativeController extends Controller
                         $query->where('users.first_name', 'LIKE', '%' . $names[0] . '%')->orWhere('users.last_name', 'LIKE', '%' . $names[0] . '%');
                     }
                 })
-                ->where('users.role', 232)
+                ->where('users.role', RoleManager::REPRESENTATIVE)
                 ->get();
 
             return $data;
@@ -187,6 +190,7 @@ class RepresentativeController extends Controller
         $id = request('id');
         $data = Cache::remember("get__rep_issue_by_id_{$id}", now()->addDays(7), function () use ($id) {
             $issue = RepresentativeIssue::join('users', 'representative_issues.representative_id', '=', 'users.id')
+                ->where('representative_issues.status','approved')
                 ->select('representative_issues.*','users.first_name', 'users.last_name')    
                 ->where('representative_issues.id', $id)
                 ->first();

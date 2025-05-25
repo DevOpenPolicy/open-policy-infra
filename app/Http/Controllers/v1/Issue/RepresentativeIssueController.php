@@ -15,6 +15,7 @@ class RepresentativeIssueController extends Controller
             'name' => $request->name,
             'summary' => $request->summary,
             'description' => $request->description,
+            'status' => 'pending'
         ]);
 
         return response()->json([

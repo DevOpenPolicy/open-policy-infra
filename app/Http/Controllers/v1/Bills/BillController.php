@@ -12,6 +12,7 @@ use App\Models\Politicians;
 use App\Models\RepresentativeIssue;
 use App\Models\SavedBill;
 use App\Models\SavedIssue;
+use App\RoleManager;
 use App\Service\v1\BillClass;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -111,8 +112,9 @@ class BillController extends Controller
         }elseif ($type == 'Issues Raised') {
             $bills = RepresentativeIssue::join('users', 'representative_issues.representative_id', '=', 'users.id')
                 ->where('users.id', $user->id)
+                ->where('representative_issues.status','approved')
                 ->select('representative_issues.name', 'representative_issues.summary', 'representative_issues.created_at as date', 'representative_issues.id')
-                ->where('users.role', 232)
+                ->where('users.role', RoleManager::REPRESENTATIVE)
                 ->get();
         }elseif ($type == 'Saved Issues') {
             $bills = SavedIssue::where('saved_issues.is_saved', 1)

@@ -37,7 +37,7 @@ class UserProfileClass
             'success' => true,
             'votes_cast' => BillVoteCast::where('user_id', $user->id)->where('is_supported',1)->count(),
             'saved_bills' =>  SavedBill::where('user_id', $user->id)->where('is_saved',1)->count(),
-            'issues_raised' => RepresentativeIssue::where('representative_id', $user->id)->count()
+            'issues_raised' => RepresentativeIssue::where('representative_id', $user->id)->where('status','approved')->count()
         ]);
     }
 

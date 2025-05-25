@@ -19,6 +19,7 @@ use App\Service\v1\RepresentativeClass;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Route;
 use Symfony\Component\DomCrawler\Crawler;
 
@@ -26,16 +27,7 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::get('/developer-ops/login', [DeveloperController::class, 'login']);
-Route::post('/dev-ops/authenticate', [DeveloperController::class, 'authenticate'])->name('dev.authenticate');
-
-Route::get('/testing/{table}', function ($table) {
-    // $table = $table ?? 'bills';
-    // return DB::table($table)->limit(100)->get();
-});
 Route::get('/counts', function () {
-    // SetupSystem::dispatch();
-    // dd('done');
 });
 
 

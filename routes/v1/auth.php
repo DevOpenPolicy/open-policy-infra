@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\v1\AdminAuthorizationController;
 use App\Http\Controllers\v1\AuthorizationController;
 use App\Http\Controllers\v1\MP\RepresentativeController;
 use App\Http\Controllers\v1\OneTimePinController;
@@ -22,34 +23,19 @@ Route::prefix('app-auth')->group(function () {
         Route::post('/send', 'sendOtp');
         Route::post('/verify', 'verifyOtp');
     });
-
-    // Route::prefix('forgot')->controller(OneTimePinController::class)->group(function () {
-    //     Route::post('/send', 'sendOtp');
-    // });
 });
 
 
 Route::prefix('admin-auth')->group(function () {
-    Route::controller(AuthorizationController::class)->group(function () {
-        Route::post('/login', 'login_user');
-        Route::post('/register', 'register_user');
-        Route::post('/logout', 'logout_user')->middleware(['auth:sanctum']);
-    });
-
-    Route::prefix('otp')->controller(OneTimePinController::class)->group(function () {
-        Route::post('/send', 'sendOtp');
-        Route::post('/verify', 'verifyOtp');
-    });
-
-    Route::prefix('forgot')->controller(OneTimePinController::class)->group(function () {
-        Route::post('/send', 'sendOtp');
-        Route::post('/verify', 'verifyOtp');
+    Route::controller(AdminAuthorizationController::class)->group(function () {
+        Route::post('/login', 'adminLogin');
+        Route::post('/send-otp', 'sendOtp');
+        Route::post('/verify-otp', 'verifyOtp');
+        Route::post('/new-password', 'newPassword');
     });
 });
 
 Route::get('/user', function (Request $request) {
-    // get Authorization key
-    // logger($request->bearerToken());
     $user = Auth::user();
 
     $representativeController = new RepresentativeController();
