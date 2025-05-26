@@ -77,7 +77,7 @@ class BillController extends Controller
         $user = Auth::user();
         if ($type == 'Saved Bills') {
             $bills = SavedBill::where('saved_bills.is_saved', 1)
-                ->select('bills.introduced', 'bills.short_name', 'bills.name', 'bills.number', 'bills.is_government_bill', 'politicians.name as politician_name')
+                ->select('bills.id','bills.introduced', 'bills.short_name', 'bills.name', 'bills.number', 'bills.is_government_bill', 'politicians.name as politician_name')
                 ->join('bills', 'saved_bills.bill_url', '=', 'bills.bill_url')
                 ->join('politicians', 'bills.politician', '=', 'politicians.politician_url')
                 ->where(function ($query) use ($search) {
@@ -93,8 +93,7 @@ class BillController extends Controller
                 ->orderBy('saved_bills.created_at', 'desc')
                 ->get();
         } elseif ($type == 'Vote Cast') {
-            $bills = BillVoteCast::where('bill_vote_casts.is_supported', 1)
-                ->select('bills.introduced', 'bills.short_name', 'bills.name', 'bills.number', 'bills.is_government_bill', 'politicians.name as politician_name')
+            $bills = BillVoteCast::select('bills.id','bills.introduced', 'bills.short_name', 'bills.name', 'bills.number', 'bills.is_government_bill', 'politicians.name as politician_name')
                 ->join('bills', 'bill_vote_casts.bill_url', '=', 'bills.bill_url')
                 ->where(function ($query) use ($search) {
                     $query
@@ -309,7 +308,7 @@ class BillController extends Controller
         Cache::forget("users_{$user->id}_vote_{$request->number}");
         Cache::forget("bill_vote_{$request->number}");
 
-        $bill = Bill::where('number', $request->number)->first();
+        $bill = Bill::where('id', $request->number)->first();
         if (!$bill) {
             return response()->json(
                 [

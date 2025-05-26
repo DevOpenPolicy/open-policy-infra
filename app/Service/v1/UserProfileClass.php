@@ -35,7 +35,7 @@ class UserProfileClass
         $user = Auth::user();
         return response()->json([
             'success' => true,
-            'votes_cast' => BillVoteCast::where('user_id', $user->id)->where('is_supported',1)->count(),
+            'votes_cast' => BillVoteCast::where('user_id', $user->id)->count(),
             'saved_bills' =>  SavedBill::where('user_id', $user->id)->where('is_saved',1)->count(),
             'issues_raised' => RepresentativeIssue::where('representative_id', $user->id)->where('status','approved')->count()
         ]);
