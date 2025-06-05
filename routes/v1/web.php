@@ -41,6 +41,8 @@ Route::prefix('web')->group(function () {
 
     Route::get('/get-house-mention', [HouseMentionController::class, 'getHouseMention']);
     Route::get('/get-bill', [HouseMentionController::class, 'getBills']);
+
+    Route::get('/get-votes', [HouseMentionController::class, 'getVotes']);
 });
 
 

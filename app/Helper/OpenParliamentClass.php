@@ -79,18 +79,6 @@ class OpenParliamentClass
                     }
                 });
 
-                $vote_url = $node->filter('.division.procedural a')->count()
-                    ? $node->filter('.division.procedural a')->attr('href')
-                    : "";
-
-                $vote_text = $node->filter('.division.procedural a')->count()
-                    ? $node->filter('.division.procedural a')->text()
-                    : "";
-
-                $vote_button = ($vote_url && $vote_text)
-                    ? "\n<Link href='#' classname='text-blue-600 hover:underline'>$vote_text</Link>"
-                    : "";
-
                 $profileHref = $profileAnchor
                     ? $politicians->where('politician_url', $profileAnchor->attr('href'))->first()?->id
                     : "";
@@ -119,7 +107,7 @@ class OpenParliamentClass
                     'name'         => $node->filter('.pol_name')->count() ? $node->filter('.pol_name')->text() : "",
                     'party'        => $node->filter('.partytag')->count() ? $node->filter('.partytag')->text() : "",
                     'riding'       => $node->filter('.pol_affil')->count() ? $node->filter('.pol_affil')->text() : "",
-                    'statement'    => $statement . $vote_button,
+                    'statement'    => $statement ,
                     'topic'        => $mainTopic,
                     'sub_topics'   => implode(' ', array_filter($subTopics)),
                     'datetime'     => $node->filter('.statement_time_permalink')->count() ? $node->filter('.statement_time_permalink')->text() : "",

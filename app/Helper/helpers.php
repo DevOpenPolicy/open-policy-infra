@@ -20,27 +20,28 @@ if (!function_exists('convertAnchorsToReactLinks')) {
                     $politician = Politicians::where('politician_url', $href)->first();
                     $href = $politician?->id ? "/mps/" . $politician->id : '#';
                 } elseif (strpos($href, '/votes/') !== false) {
-                    $href = '#';
-                    $vote = BillVoteSummary::where('vote_url', $href)->first();
-                    if(!$vote){
-                        $voteData = (new OpenParliamentClass())->getPolicyInformation($href);
-                        $href = '#';
-                        if ($voteData) {
-                            $voteStore = BillVoteSummary::create([
-                                'bill_url' => $voteData['bill_url'] ?? '',
-                                'session' => $voteData['session'] ?? '',
-                                'description' => $voteData['description']['en'] ?? '',
-                                'result' => $voteData['result'] ?? '',
-                                'vote_url' => $voteData['url'] ?? $href,
-                                'vote_json' => json_encode($voteData),
-                            ]);
-                            // $href = $voteStore;
-                            // $href = $voteStore->id ? "/votes/" . $voteStore->id : '#';
-                        }
-                    }else{
-                        // $href = $vote;
-                        // $href = $vote?->id ? "/votes/" . $vote->id : '#';
-                    }
+                    $href = $href;
+                    // $href = '#';
+                    // $vote = BillVoteSummary::where('vote_url', $href)->first();
+                    // if(!$vote){
+                    //     $voteData = (new OpenParliamentClass())->getPolicyInformation($href);
+                    //     if ($voteData) {
+                    //         $voteStore = BillVoteSummary::create([
+                    //             'bill_url' => $voteData['bill_url'] ?? '',
+                    //             'session' => $voteData['session'] ?? '',
+                    //             'description' => $voteData['description']['en'] ?? '',
+                    //             'result' => $voteData['result'] ?? '',
+                    //             'vote_url' => $voteData['url'] ?? $href,
+                    //             'vote_json' => json_encode($voteData),
+                    //         ]);
+                    //         $href = $voteStore;
+                    //         $href = $voteStore->id ? "/votes/" . $voteStore->id : '#';
+                    //     }
+                    // }else{
+                    //     $href = $vote;
+                    //     $href = $vote?->id ? "/votes/" . $vote->id : '#';
+                    // }
+                    // logger($href);
                 } elseif (strpos($href, '/bills/') !== false) {
                     $bill = Bill::where('bill_url', $href)->first();
                     $href = $bill?->id ? "/bills/" . $bill->id : '#';
