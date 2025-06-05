@@ -95,7 +95,6 @@ class HouseMentionController extends Controller
                 
             
             $temp->summary = $summary;
-            return $temp;
         // });
 
         return response()->json([
