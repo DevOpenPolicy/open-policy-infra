@@ -55,7 +55,7 @@ class HouseMentionController extends Controller
     public function getVotes(){
         $vote = request('vote');
 
-        $data =  Cache::remember("votes_web_view_{$vote}", now()->addMinutes(3), function () use ($vote) {
+        // $data =  Cache::remember("votes_web_view_{$vote}", now()->addMinutes(3), function () use ($vote) {
             $politicians = Cache::remember('all_politicians_votes_section', now()->addDays(3), function () {
                 return Politicians::select('politician_url','name','party_short_name')->get();
             });
@@ -79,6 +79,7 @@ class HouseMentionController extends Controller
                     $data['vote'] = $item['ballot'];
                     if(!$politician){
                         CreateNewMpJob::dispatch($item['politician_url']);
+                        return null;
                     }
 
                     return $data;
@@ -95,11 +96,11 @@ class HouseMentionController extends Controller
             
             $temp->summary = $summary;
             return $temp;
-        });
+        // });
 
         return response()->json([
             'success' => true,
-            'data' => $data
+            'data' => $temp
         ]);
     }
 }
