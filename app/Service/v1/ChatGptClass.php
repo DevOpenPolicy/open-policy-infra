@@ -18,15 +18,14 @@ class ChatGptClass
 
     public function generateBillResponse(string $billNumber, string $summary, ?string $instruction = null): string
     {
-        $systemMessage = "You are a helpful assistant that ONLY answers questions about Canadian Parliament bills. " .
-                         "If the user asks anything unrelated, politely say: 'I'm sorry, I can only answer questions about bills.'";
+        $systemMessage = "You are a helpful assistant that answers using the information provided.";
 
         $userPrompt = "Bill Number: $billNumber\nSummary: $summary\n";
         if ($instruction) {
             $userPrompt .= "Instruction: $instruction\n";
         }
 
-        $userPrompt .= "Only answer using the information above.";
+        $userPrompt .= "answer using the information above.";
 
         $response = $this->client->post('https://api.openai.com/v1/chat/completions', [
             'headers' => [
@@ -51,9 +50,7 @@ class ChatGptClass
 
     public function generateIssueResponse(string $summary, ?string $instruction = null): string
     {
-        $systemMessage = "You are a helpful assistant that ONLY answers questions about issues raised by Members of the Canadian Parliament that are NOT formal bills. " .
-                 "These can include motions, petitions, statements, or debates initiated by MPs. " .
-                 "If the user asks about formal bills or anything unrelated, politely say: 'I'm sorry, I can only answer questions about non-bill issues raised by Members of Parliament.'";
+        $systemMessage = "You are a helpful assistant that answers using the information provided";
 
         $userPrompt = "Summary: $summary\n";
         if ($instruction) {
