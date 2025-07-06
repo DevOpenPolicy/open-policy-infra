@@ -25,7 +25,7 @@ class BillController extends Controller
     public function getBills(){
         $search = request('search');
         $bill_search = request('bill_search');
-        $session_search = request('session_search')?: '44-1';
+        $session_search = request('session_search')?: '45-1';
 
         
         $data = Cache::remember("web_bills_page_{$search}_{$bill_search}_{$session_search}", now()->addDays(7), function () use ($search, $bill_search,$session_search) {

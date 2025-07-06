@@ -45,7 +45,7 @@ class BillController extends Controller
         $bills = Cache::remember("app_bills_page_{$search}_{$type}", now()->addDays(7), function () use ($search, $type) {
             return Bill::select('bills.id','bills.introduced', 'bills.short_name', 'bills.name', 'bills.number', 'bills.is_government_bill', 'politicians.name as politician_name')
                 ->join('politicians', 'bills.politician', '=', 'politicians.politician_url')
-                ->where('bills.session', '44-1')
+                ->where('bills.session', '45-1')
                 ->whereNotIn('bills.number', ['c-1', 's-1'])
                 ->where(function ($query) use ($search) {
                     $query
@@ -88,7 +88,7 @@ class BillController extends Controller
                         ->orWhere('politicians.name', 'like', "%{$search}%");
                 })
                 ->where('saved_bills.user_id', $user->id)
-                ->where('bills.session', '44-1')
+                ->where('bills.session', '45-1')
                 ->whereNotIn('bills.number', ['c-1', 's-1'])
                 ->orderBy('saved_bills.created_at', 'desc')
                 ->get();
@@ -104,7 +104,7 @@ class BillController extends Controller
                 })
                 ->join('politicians', 'bills.politician', '=', 'politicians.politician_url')
                 ->where('bill_vote_casts.user_id', $user->id)
-                ->where('bills.session', '44-1')
+                ->where('bills.session', '45-1')
                 ->whereNotIn('bills.number', ['c-1', 's-1'])
                 ->orderBy('bill_vote_casts.created_at', 'desc')
                 ->get();
@@ -143,7 +143,7 @@ class BillController extends Controller
         $bill = Cache::remember("app_bill_{$number}", now()->addDays(7), function () use ($number) {
             $data = Bill::select('bills.*', 'politicians.name as politician_name', 'politicians.id as politician_id')
                 ->join('politicians', 'bills.politician', '=', 'politicians.politician_url')
-                ->where('bills.session', '44-1')
+                ->where('bills.session', '45-1')
                 ->where('bills.id', $number)
                 ->first();
 

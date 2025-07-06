@@ -17,15 +17,15 @@ class BillClass
     }
 
     public function getAllBills(){
-        return $this->openParliamentClass->getPolicyInformation('/bills/?session=44-1');
+        return $this->openParliamentClass->getPolicyInformation('/bills/?session=45-1');
     }
 
     public function getGovernmentBills(){
-        return $this->openParliamentClass->getPolicyInformation('/bills/?session=44-1&private_member_bill=false');
+        return $this->openParliamentClass->getPolicyInformation('/bills/?session=45-1&private_member_bill=false');
     }
 
     public function getPrivateMemberBills(){
-        return $this->openParliamentClass->getPolicyInformation('/bills/?session=44-1&private_member_bill=true');
+        return $this->openParliamentClass->getPolicyInformation('/bills/?session=45-1&private_member_bill=true');
     }
 
     public function nextBillsPageUrl($url){

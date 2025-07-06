@@ -13,6 +13,7 @@ class AppLinkController extends Controller
     {
         $link = request('link');
 
+        $link = ltrim($link, '/');
         if (array_filter(['bills', 'debate', 'committees', 'votes'], fn($keyword) => str_contains($link, $keyword))) {
             return response()->json([
                 'success' => true,

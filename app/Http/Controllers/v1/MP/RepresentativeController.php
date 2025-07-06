@@ -140,27 +140,9 @@ class RepresentativeController extends Controller
             $data->image = $politician->politician_image;
             $data->email = $politician->email;
             $data->phone = $politician->voice;
-            $recent_activities = $this->representativeClass->getRepresentativeRecentActivities($representative);
-
-            $vote_activity = [];
-            $house_activity = [];
-
-            foreach ($recent_activities as $activity) {
-                if (strpos($activity['title'], 'Voted') !== false) {
-                    $vote_activity[] = (object) [
-                        'info' => $activity['title'] . ': ' . $this->representativeClass->stripHtmlToText($activity['description']),
-                        'link' => str_replace('http://openparliament.ca/', '', $activity['link']),
-                    ];
-                } else {
-                    $house_activity[] = (object) [
-                        'info' => $activity['title'] . ': ' . $this->representativeClass->stripHtmlToText($activity['description']),
-                        'link' => str_replace('http://openparliament.ca/', '', $activity['link']),
-                    ];
-                }
-            }
-
-            $data->vote_activity = $vote_activity;
-            $data->house_activity = $house_activity;
+            $recent_activities = $this->representativeClass->getActivityLog($politician);
+            $data->vote_activity = $recent_activities['vote_activity'];
+            $data->house_activity = $recent_activities['house_activity'];
 
             $names = explode(' ', $representative['name']);
 
