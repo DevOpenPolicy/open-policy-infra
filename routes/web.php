@@ -6,8 +6,11 @@ use App\Http\Controllers\DeveloperController;
 use App\Jobs\SetupSystem;
 use App\Jobs\SystemSetUp;
 use App\Models\Bill;
+use App\Models\BillVoteSummary;
 use App\Models\Committee;
 use App\Models\CommitteeYearLog;
+use App\Models\CommitteeYearLogData;
+use App\Models\Debate;
 use App\Models\ParliamentSession;
 use App\Models\PoliticianActivityLog;
 use App\Models\Politicians;
@@ -28,6 +31,17 @@ Route::get('/', function () {
 });
 
 Route::get('/counts', function () {
+    Bill::truncate();
+    BillVoteSummary::truncate();
+    Committee::truncate();
+    CommitteeYearLog::truncate();
+    CommitteeYearLogData::truncate();
+    Debate::truncate();
+    ParliamentSession::truncate();
+    Politicians::truncate();
+    PoliticianActivityLog::truncate();
+
+    dd('done');
 });
 
 
