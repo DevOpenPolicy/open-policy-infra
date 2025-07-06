@@ -31,49 +31,6 @@ Route::get('/', function () {
 });
 
 Route::get('/counts', function () {
-    $activirttt =  json_decode(PoliticianActivityLog::first()->activity);
-
-    $vote_activity = [];
-    $house_activity = [];
-
-    foreach ($activirttt as $activity => $value) {
-        if($value->isTitle == true) continue;
-
-        $html = $value->text;
-
-        libxml_use_internal_errors(true); // suppress warnings
-
-        $dom = new DOMDocument();
-        $dom->loadHTML(mb_convert_encoding($html, 'HTML-ENTITIES', 'UTF-8'));
-
-        // Get all <a> elements
-        $links = $dom->getElementsByTagName('a');
-        $firstHref = $links->length > 0 ? $links->item(0)->getAttribute('href') : null;
-
-        // Replace each <a> tag with its inner text
-        foreach (iterator_to_array($links) as $a) {
-            $textNode = $dom->createTextNode($a->nodeValue);
-            $a->parentNode->replaceChild($textNode, $a);
-        }
-
-        // Extract cleaned full text
-        $body = $dom->getElementsByTagName('body')->item(0);
-        $cleanText = trim($body->textContent);
-
-        // dd($value);
-        if (strpos($value->title, 'Voted') !== false) {
-            $vote_activity[] = (object) [
-                'info' => $cleanText,
-                'link' => $firstHref,
-            ];
-        } else {
-            $house_activity[] = (object) [
-                'info' => $cleanText,
-                'link' => $firstHref,
-            ];
-        }
-    }
-    dd($vote_activity, $house_activity);
 });
 
 
