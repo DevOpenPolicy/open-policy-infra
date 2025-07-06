@@ -45,21 +45,22 @@ class GenerateContentClass
         ParliamentSession::truncate();
         $openParliamentClass = new OpenParliamentClass();
         $sessionOptions = [
-            ['name' => '44th Parliament, 1st Session', 'session' => '44-1'],
-            ['name' => '43rd Parliament, 2nd Session', 'session' => '43-2'],
-            ['name' => '43rd Parliament, 1st Session', 'session' => '43-1'],
-            ['name' => '42nd Parliament, 1st Session', 'session' => '42-1'],
-            ['name' => '41st Parliament, 2nd Session', 'session' => '41-2'],
-            ['name' => '41st Parliament, 1st Session', 'session' => '41-1'],
-            ['name' => '40th Parliament, 3rd Session', 'session' => '40-3'],
-            ['name' => '40th Parliament, 2nd Session', 'session' => '40-2'],
-            ['name' => '40th Parliament, 1st Session', 'session' => '40-1'],
-            ['name' => '39th Parliament, 2nd Session', 'session' => '39-2'],
-            ['name' => '39th Parliament, 1st Session', 'session' => '39-1'],
-            ['name' => '38th Parliament, 1st Session', 'session' => '38-1'],
-            ['name' => '37th Parliament, 3rd Session', 'session' => '37-3'],
-            ['name' => '37th Parliament, 2nd Session', 'session' => '37-2'],
             ['name' => '37th Parliament, 1st Session', 'session' => '37-1'],
+            ['name' => '37th Parliament, 2nd Session', 'session' => '37-2'],
+            ['name' => '37th Parliament, 3rd Session', 'session' => '37-3'],
+            ['name' => '38th Parliament, 1st Session', 'session' => '38-1'],
+            ['name' => '39th Parliament, 1st Session', 'session' => '39-1'],
+            ['name' => '39th Parliament, 2nd Session', 'session' => '39-2'],
+            ['name' => '40th Parliament, 1st Session', 'session' => '40-1'],
+            ['name' => '40th Parliament, 2nd Session', 'session' => '40-2'],
+            ['name' => '40th Parliament, 3rd Session', 'session' => '40-3'],
+            ['name' => '41st Parliament, 1st Session', 'session' => '41-1'],
+            ['name' => '41st Parliament, 2nd Session', 'session' => '41-2'],
+            ['name' => '42nd Parliament, 1st Session', 'session' => '42-1'],
+            ['name' => '43rd Parliament, 1st Session', 'session' => '43-1'],
+            ['name' => '43rd Parliament, 2nd Session', 'session' => '43-2'],
+            ['name' => '44th Parliament, 1st Session', 'session' => '44-1'],
+            ['name' => '45th Parliament, 1st Session', 'session' => '45-1'],
         ];
 
         foreach ($sessionOptions as $session) {
