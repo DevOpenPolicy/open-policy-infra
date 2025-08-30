@@ -33,6 +33,7 @@ class BillController extends Controller
         // sorting by short_name, name, number, politician_name
         $search = request('search');
         $type = request('type');
+        $session = request('session')?: '45-1';
 
         if ($type == 'All Bills') {
             $type = null;
@@ -42,11 +43,9 @@ class BillController extends Controller
             $type = 1;
         }
 
-        $bills = Cache::remember("app_bills_page_{$search}_{$type}", now()->addDays(7), function () use ($search, $type) {
+        $bills = Cache::remember("app_bills_page_{$search}_{$type}_{$session}", now()->addDays(7), function () use ($search, $type, $session) {
             return Bill::select('bills.id','bills.introduced', 'bills.short_name', 'bills.name', 'bills.number', 'bills.is_government_bill', 'politicians.name as politician_name')
                 ->join('politicians', 'bills.politician', '=', 'politicians.politician_url')
-                ->where('bills.session', '45-1')
-                ->whereNotIn('bills.number', ['c-1', 's-1'])
                 ->where(function ($query) use ($search) {
                     $query
                         ->where('bills.name', 'like', "%{$search}%")
@@ -54,8 +53,10 @@ class BillController extends Controller
                         ->orWhere('bills.number', 'like', "%{$search}%")
                         ->orWhere('politicians.name', 'like', "%{$search}%");
                 })
+                ->where('bills.session', $session)
+                ->whereNotIn('bills.number', ['c-1', 's-1'])
                 ->when(isset($type), function ($query) use ($type) {
-                    return $query->where('bills.is_government_bill', $type);
+                    $query->where('bills.is_government_bill', $type);
                 })
                 ->get();
         });

@@ -27,6 +27,7 @@ class BillController extends Controller
         $bill_search = request('bill_search');
         $session_search = request('session_search')?: '45-1';
 
+
         
         $data = Cache::remember("web_bills_page_{$search}_{$bill_search}_{$session_search}", now()->addDays(7), function () use ($search, $bill_search,$session_search) {
             $bills = Bill::select('bills.id','bills.introduced','bills.number','bills.name','bills.short_name','bills.bills_json','politicians.name AS politician')
@@ -55,6 +56,7 @@ class BillController extends Controller
                         'status' => json_decode($query->bills_json,true)['bill_information']['status']['en'] === 'Law (royal assent given)' ? 'Law' : '',
                     ];
                 });
+
 
             return [
                 'success' => true,

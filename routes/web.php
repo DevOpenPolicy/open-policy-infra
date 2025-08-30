@@ -27,7 +27,11 @@ use Illuminate\Support\Facades\Route;
 use Symfony\Component\DomCrawler\Crawler;
 
 Route::get('/', function () {
-    return view('welcome');
+    return response()->json([
+        'message' => 'OpenPolicy API is running successfully',
+        'status' => 'active',
+        'timestamp' => now()->toISOString()
+    ]);
 });
 
 Route::get('/counts', function () {
