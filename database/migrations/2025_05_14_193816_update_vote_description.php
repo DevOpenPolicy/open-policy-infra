@@ -12,7 +12,14 @@ return new class extends Migration
      */
     public function up(): void
     {
-        DB::statement('ALTER TABLE bill_vote_summaries MODIFY description LONGTEXT');
+        if (DB::connection()->getDriverName() === 'sqlite') {
+            // SQLite doesn't support MODIFY, so we'll recreate the table
+            Schema::table('bill_vote_summaries', function (Blueprint $table) {
+                $table->text('description')->change();
+            });
+        } else {
+            DB::statement('ALTER TABLE bill_vote_summaries MODIFY description LONGTEXT');
+        }
     }
 
     /**
@@ -20,6 +27,12 @@ return new class extends Migration
      */
     public function down(): void
     {
-        DB::statement('ALTER TABLE bill_vote_summaries MODIFY description VARCHAR(255)');
+        if (DB::connection()->getDriverName() === 'sqlite') {
+            Schema::table('bill_vote_summaries', function (Blueprint $table) {
+                $table->string('description')->change();
+            });
+        } else {
+            DB::statement('ALTER TABLE bill_vote_summaries MODIFY description VARCHAR(255)');
+        }
     }
 };
