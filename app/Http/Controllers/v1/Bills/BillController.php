@@ -45,7 +45,7 @@ class BillController extends Controller
 
         $bills = Cache::remember("app_bills_page_{$search}_{$type}_{$session}", now()->addDays(7), function () use ($search, $type, $session) {
             return Bill::select('bills.id','bills.introduced', 'bills.short_name', 'bills.name', 'bills.number', 'bills.is_government_bill', 'politicians.name as politician_name')
-                ->join('politicians', 'bills.politician', '=', 'politicians.politician_url')
+                ->leftJoin('politicians', 'bills.politician', '=', 'politicians.politician_url')
                 ->where(function ($query) use ($search) {
                     $query
                         ->where('bills.name', 'like', "%{$search}%")
