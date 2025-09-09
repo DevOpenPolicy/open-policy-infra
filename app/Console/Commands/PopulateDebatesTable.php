@@ -32,7 +32,9 @@ class PopulateDebatesTable extends Command
 
         foreach ($years as $year) {
             $url = "/debates/$year/?limit=1000";
-            $data = (new OpenParliamentClass())->getPolicyInformation($url);
+
+            $openParliamentClass = new OpenParliamentClass();
+            $data = $openParliamentClass->getPolicyInformation($url);
 
             foreach ($data['objects'] as $value) {
                 $debate = new Debate();

@@ -31,20 +31,10 @@ class setUpCommitee extends Command
      */
     public function handle()
     {
-        // Committee::truncate();
-        // CommitteeYearLog::truncate();
-        // CommitteeYearLogData::truncate();
 
         $data = (new OpenParliamentClass())->getPolicyInformation('/committees/?limit=1000');
 
         foreach ($data['objects'] as $value) {
-            // $committee = new \App\Models\Committee();
-            // $committee->name = $value['name']['en'];
-            // $committee->short_name = $value['short_name']['en'];
-            // $committee->slug = $value['slug'];
-            // $committee->parent_url = $value['parent_url'];
-            // $committee->committee_url = $value['url'];
-            // $committee->save();
 
             Committee::updateOrCreate(
                 ['slug' => $value['slug']], // unique condition
@@ -95,12 +85,6 @@ class setUpCommitee extends Command
                         'committee_id' => $value->id
                     ],
                 );
-
-                // $committeeYearLog = new CommitteeYearLog();
-                // $committeeYearLog->committee_id = $value->id;
-                // $committeeYearLog->year = $d['year'];
-                // $committeeYearLog->url = $d['url'];
-                // $committeeYearLog->save();
             }
         }
 
@@ -148,12 +132,6 @@ class setUpCommitee extends Command
                         'committee_year_log_id' => $value->id
                     ],
                 );
-
-                // $committeeYearLogData = new \App\Models\CommitteeYearLogData();
-                // $committeeYearLogData->committee_year_log_id = $value->id;
-                // $committeeYearLogData->date = $link[0]['date'];
-                // $committeeYearLogData->url = $link[0]['url'];
-                // $committeeYearLogData->save();
             }
         }
     }

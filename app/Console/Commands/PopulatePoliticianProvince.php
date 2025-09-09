@@ -33,7 +33,5 @@ class PopulatePoliticianProvince extends Command
                 ['name' => $province[0], 'short_name' => $province[1]], // update if exists
             );
         }
-
-        // $this->info('Politician provinces populated successfully.');
     }
 }
