@@ -28,25 +28,44 @@ class CheckIsFormerMp extends Command
     public function handle()
     {
         $openParliamentClass = new OpenParliamentClass();
-        $politicians = $openParliamentClass->getPolicyInformation('/politicians/?include=former&limit=500');
-        $politicians = $politicians['objects'];
+        // $politicians = $openParliamentClass->getPolicyInformation('/politicians/?include=former&limit=500');
+        // $politicians = $politicians['objects'];
 
-        foreach ($politicians as $politician) {
+        // foreach ($politicians as $politician) {
+        //     Politicians::where('politician_url', $politician['url'])->update([
+        //         'is_former' => true
+        //     ]);
+        // }
+
+        // $openParliamentClass = new OpenParliamentClass();
+        // $politicians = $openParliamentClass->getPolicyInformation('/politicians/?include=former&limit=500&offset=500');
+        // $politicians = $politicians['objects'];
+
+        // foreach ($politicians as $politician) {
+        //     Politicians::where('politician_url', $politician['url'])->update([
+        //         'is_former' => true
+        //     ]);
+        // }
+
+        $allPoliticians = [];
+        $url = '/politicians/?include=former&limit=500';
+
+        do {
+            $politicians = $openParliamentClass->getPolicyInformation($url);
+
+            if (isset($politicians['objects']) && is_array($politicians['objects'])) {
+                $allPoliticians = array_merge($allPoliticians, $politicians['objects']);
+            }
+
+            $url = $politicians['pagination']['next_url'] ?? null;
+        } while (!empty($url));
+
+        foreach ($allPoliticians as $politician) {
             Politicians::where('politician_url', $politician['url'])->update([
                 'is_former' => true
             ]);
         }
 
-        $openParliamentClass = new OpenParliamentClass();
-        $politicians = $openParliamentClass->getPolicyInformation('/politicians/?include=former&limit=500&offset=500');
-        $politicians = $politicians['objects'];
-
-        foreach ($politicians as $politician) {
-            Politicians::where('politician_url', $politician['url'])->update([
-                'is_former' => true
-            ]);
-        }
-
-        $this->info('Politician provinces populated successfully.');
+        // $this->comment('Politician provinces populated successfully.');
     }
 }

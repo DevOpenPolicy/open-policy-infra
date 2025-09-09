@@ -1,5 +1,6 @@
 <?php
 
+use App\Console\Commands\getSummaryForAllBills;
 use App\GenerateContentClass;
 use App\Helper\OpenParliamentClass;
 use App\Http\Controllers\DeveloperController;
@@ -34,8 +35,6 @@ Route::get('/', function () {
     ]);
 });
 
-Route::get('/counts', function () {
-});
 
 
 
