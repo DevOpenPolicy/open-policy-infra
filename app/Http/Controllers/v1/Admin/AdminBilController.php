@@ -32,7 +32,7 @@ class AdminBilController extends Controller
                   ->orWhere('politicians.name', 'like', "%{$search}%");
             });
         })
-        ->join('politicians', 'bills.politician', '=', 'politicians.politician_url')
+        ->leftJoin('politicians', 'bills.politician', '=', 'politicians.politician_url')
         ->leftJoin('bill_vote_casts', 'bills.bill_url', '=', 'bill_vote_casts.bill_url')
         ->whereNotIn('bills.number', ['c-1', 's-1'])
         ->groupBy(

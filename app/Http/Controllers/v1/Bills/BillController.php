@@ -58,6 +58,7 @@ class BillController extends Controller
                 ->when(isset($type), function ($query) use ($type) {
                     $query->where('bills.is_government_bill', $type);
                 })
+                ->latest('introduced')
                 ->get();
         });
 
@@ -80,7 +81,7 @@ class BillController extends Controller
             $bills = SavedBill::where('saved_bills.is_saved', 1)
                 ->select('bills.id','bills.introduced', 'bills.short_name', 'bills.name', 'bills.number', 'bills.is_government_bill', 'politicians.name as politician_name')
                 ->join('bills', 'saved_bills.bill_url', '=', 'bills.bill_url')
-                ->join('politicians', 'bills.politician', '=', 'politicians.politician_url')
+                ->leftJoin('politicians', 'bills.politician', '=', 'politicians.politician_url')
                 ->where(function ($query) use ($search) {
                     $query
                         ->where('bills.name', 'like', "%{$search}%")
@@ -103,7 +104,7 @@ class BillController extends Controller
                         ->orWhere('bills.number', 'like', "%{$search}%")
                         ->orWhere('politicians.name', 'like', "%{$search}%");
                 })
-                ->join('politicians', 'bills.politician', '=', 'politicians.politician_url')
+                ->leftJoin('politicians', 'bills.politician', '=', 'politicians.politician_url')
                 ->where('bill_vote_casts.user_id', $user->id)
                 ->where('bills.session', '45-1')
                 ->whereNotIn('bills.number', ['c-1', 's-1'])
@@ -143,7 +144,7 @@ class BillController extends Controller
     {
         $bill = Cache::remember("app_bill_{$number}", now()->addDays(7), function () use ($number) {
             $data = Bill::select('bills.*', 'politicians.name as politician_name', 'politicians.id as politician_id')
-                ->join('politicians', 'bills.politician', '=', 'politicians.politician_url')
+                ->leftJoin('politicians', 'bills.politician', '=', 'politicians.politician_url')
                 ->where('bills.session', '45-1')
                 ->where('bills.id', $number)
                 ->first();

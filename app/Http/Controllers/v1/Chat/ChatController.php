@@ -28,7 +28,7 @@ class ChatController extends Controller
 
 
             $data = Bill::select('bills.*', 'politicians.name as politician_name')
-                ->join('politicians', 'bills.politician', '=', 'politicians.politician_url')
+                ->leftJoin('politicians', 'bills.politician', '=', 'politicians.politician_url')
                 ->where('bills.session', '45-1')
                 ->where('bills.number', $number)
                 ->first();
