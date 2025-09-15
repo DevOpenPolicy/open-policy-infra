@@ -78,7 +78,7 @@ class HouseMentionController extends Controller
                     $data['party'] = $politician ? $politician->party_short_name : null;
                     $data['vote'] = $item['ballot'];
                     if(!$politician){
-                        CreateNewMpJob::dispatch($item['politician_url']);
+                        // CreateNewMpJob::dispatch($item['politician_url']);
                         return null;
                     }
 

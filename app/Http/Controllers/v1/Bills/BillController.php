@@ -145,7 +145,7 @@ class BillController extends Controller
         $bill = Cache::remember("app_bill_{$number}", now()->addDays(7), function () use ($number) {
             $data = Bill::select('bills.*', 'politicians.name as politician_name', 'politicians.id as politician_id')
                 ->leftJoin('politicians', 'bills.politician', '=', 'politicians.politician_url')
-                ->where('bills.session', '45-1')
+                // ->where('bills.session', '45-1')
                 ->where('bills.id', $number)
                 ->first();
 

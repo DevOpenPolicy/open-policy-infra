@@ -37,12 +37,15 @@ class PopulateDebatesTable extends Command
             $data = $openParliamentClass->getPolicyInformation($url);
 
             foreach ($data['objects'] as $value) {
-                $debate = new Debate();
-                $debate->date = $value['date'];
-                $debate->number = $value['number'];
-                $debate->most_frequent_word = $value['most_frequent_word']['en'];
-                $debate->debate_url = $value['url'];
-                $debate->save();
+                Debate::updateOrCreate(
+                    ['debate_url' => $value['url']],
+                    [
+                        'date' => $value['date'],
+                        'number' => $value['number'],
+                        'most_frequent_word' => $value['most_frequent_word']['en'],
+                        'debate_url' => $value['url']
+                    ]
+                );
             }
         }
         // dd('done');

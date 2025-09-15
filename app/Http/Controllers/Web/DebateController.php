@@ -28,7 +28,7 @@ class DebateController extends Controller
     }
 
     public function getYearDate(){
-        $year = request('year') ?? 2024;
+        $year = request('year') ?? now()->year;
         $startMonth = Carbon::createFromDate($year, 1, 1)->startOfYear();
         $endMonth = Carbon::createFromDate($year, 12, 31)->endOfYear();
 

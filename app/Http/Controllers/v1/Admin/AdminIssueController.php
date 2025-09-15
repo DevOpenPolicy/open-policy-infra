@@ -233,8 +233,8 @@ class AdminIssueController extends Controller
     }
 
     public function updateIssues($id, Request $request){
-        logger($id);
-        logger($request->status);
+        // logger($id);
+        // logger($request->status);
 
         if($request->status == 'waiting'){
             $status = 'pending';
