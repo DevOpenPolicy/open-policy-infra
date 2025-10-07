@@ -58,7 +58,7 @@ class BillController extends Controller
                 ->when(isset($type), function ($query) use ($type) {
                     $query->where('bills.is_government_bill', $type);
                 })
-                ->latest('introduced')
+                ->orderBy('bills.is_government_bill','DESC')
                 ->get();
         });
 
