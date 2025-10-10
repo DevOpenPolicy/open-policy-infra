@@ -86,6 +86,7 @@ class GenerateContentClass
             $allPrivateBills = [];
 
             do {
+                // echo $url . "\n";
                 $privateBills = $openParliamentClass->getPolicyInformation($url);
 
                 if (isset($privateBills['objects']) && is_array($privateBills['objects'])) {
@@ -101,6 +102,7 @@ class GenerateContentClass
             $allGovernmentBills = [];
 
             do {
+                // echo $url . "\n";
                 $governmentBills = $openParliamentClass->getPolicyInformation($url);
 
                 if (isset($governmentBills['objects']) && is_array($governmentBills['objects'])) {
@@ -152,8 +154,8 @@ class GenerateContentClass
                         [
                             'session' => $bill['session'],
                             'introduced' => $bill['introduced'],
-                            'name' => $bill_information['name']['en'],
-                            'short_name' => !empty($bill_information['short_title']['en']) ? $bill_information['short_title']['en'] : $bill_information['name']['en'],
+                            'name' => $bill['name']['en'],
+                            'short_name' => !empty($bill_information['short_title']['en']) ? $bill_information['short_title']['en'] : $bill['name']['en'],
                             'number' => $bill['number'],
                             'politician' => $bill_information['sponsor_politician_url'] ?? 'government',
                             'is_government_bill' => $is_gov,
@@ -170,7 +172,7 @@ class GenerateContentClass
                         sleep(60); 
                         continue; 
                     }
-
+                    
                     logger($e);
                     break;
                 }
