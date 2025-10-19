@@ -49,11 +49,17 @@ class AuthorizationController extends Controller
         $user = User::where('email', $googleUser->getEmail())->first();
 
         if (!$user) {
+
+            $uniquePhone = '+1' . rand(1000000000, 9999999999);
+            while (User::where('phone', $uniquePhone)->exists()) {
+                $uniquePhone = '+1' . rand(1000000000, 9999999999);
+            }
+            
             $user = User::create([
                 'first_name' => $googleUser->user['given_name'] ?? '',
                 'last_name' => $googleUser->user['family_name'] ?? '',
                 'email' => $googleUser->getEmail(),
-                'phone' => '+1234567890', 
+                'phone' => $uniquePhone,
                 'postal_code' => 'K1A 0A6', 
                 'password' => Hash::make(Str::random(24)),
             ]);
