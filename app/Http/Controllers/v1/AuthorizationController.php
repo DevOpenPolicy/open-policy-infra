@@ -13,6 +13,9 @@ use App\Service\v1\Auth\AuthorizationClass;
 use App\Service\v1\Auth\OneTimePasswordClass;
 use App\SMS;
 use Illuminate\Http\Request;
+use Laravel\Socialite\Facades\Socialite;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 
 class AuthorizationController extends Controller
 {
@@ -33,6 +36,85 @@ class AuthorizationController extends Controller
     public function forgot_password(ForgotPasswordRequest $request){
         return $this->authorization_class->forgot_password($request);
     }
+
+    public function googleLogin(Request $request)
+{
+    $token = $request->input('access_token');
+
+    try {
+        $googleUser = Socialite::driver('google')->stateless()->userFromToken($token);
+
+        $user = User::where('email', $googleUser->getEmail())->first();
+
+        if (!$user) {
+            $user = User::create([
+                'first_name' => $googleUser->user['given_name'] ?? '',
+                'last_name' => $googleUser->user['family_name'] ?? '',
+                'email' => $googleUser->getEmail(),
+                'password' => Hash::make(Str::random(24)),
+                'phone_verified_at' => now(),
+            ]);
+        }
+
+        $authToken = $user->createToken('authorization_token')->plainTextToken;
+
+        return response()->json([
+            'success' => true,
+            'token' => $authToken,
+            'user' => $user,
+            'message' => 'Google login successful',
+        ]);
+    } catch (\Exception $e) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Failed to authenticate Google user',
+            'error' => $e->getMessage(),
+        ], 500);
+    }
+}
+
+public function facebookLogin(Request $request)
+{
+    $token = $request->input('access_token');
+
+    if (!$token) {
+        return response()->json([
+            'success' => false,
+            'message' => 'No access token provided'
+        ], 400);
+    }
+
+    try {
+        $facebookUser = Socialite::driver('facebook')->stateless()->userFromToken($token);
+
+        $user = User::where('email', $facebookUser->getEmail())->first();
+
+        if (!$user) {
+            $user = User::create([
+                'first_name' => $facebookUser->user['first_name'] ?? '',
+                'last_name' => $facebookUser->user['last_name'] ?? '',
+                'email' => $facebookUser->getEmail(),
+                'password' => Hash::make(Str::random(16)),
+                'phone_verified_at' => now(),
+            ]);
+        }
+
+        $authToken = $user->createToken('authorization_token')->plainTextToken;
+
+        return response()->json([
+            'success' => true,
+            'token' => $authToken,
+            'user' => $user,
+            'message' => 'Facebook login successful',
+        ]);
+    } catch (\Exception $e) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Facebook authentication failed',
+            'error' => $e->getMessage(),
+        ], 500);
+    }
+}
 
     public function check_email(Request $request){
         if(!$request->email){

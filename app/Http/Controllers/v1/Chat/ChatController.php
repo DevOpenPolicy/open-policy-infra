@@ -22,6 +22,7 @@ class ChatController extends Controller
     public function getBillInformation(){
         $number = request('bill_number');
 
+
         $chat_info = Cache::remember("chat_bill_{$number}", now()->addDays(7), function () use ($number) {
             $data = Cache::get("bill_{$number}");
             if($data) return $data;
