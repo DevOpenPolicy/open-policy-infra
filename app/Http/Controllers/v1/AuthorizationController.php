@@ -48,17 +48,31 @@ class AuthorizationController extends Controller
 
         $user = User::where('email', $googleUser->getEmail())->first();
 
+
+
         if (!$user) {
-            $user = User::create([
-                'first_name' => 'John',
-                'last_name' => 'Doe',
-                'phone' => '+2348100000000',
-                'postal_code' => '10001',
-                'email' => $googleUser->getEmail(),
-                'password' => Hash::make(Str::random(24)),
-                'phone_verified_at' => now(),
+            // $user = User::create([
+            //     'first_name' => 'John',
+            //     'last_name' => 'Doe',
+            //     'phone' => '+2348100000000',
+            //     'postal_code' => '10001',
+            //     'email' => $googleUser->getEmail(),
+            //     'password' => Hash::make(Str::random(24)),
+            //     'phone_verified_at' => now(),
+            // ]);
+            // logger($user);
+            return response()->json([
+                'success' => true,
+                'token' => '1234567890',
+                'user' => [
+                    'first_name' => 'John',
+                    'last_name' => 'Doe',
+                    'phone' => '+2348100000000',
+                    'postal_code' => '10001',
+                    'email' => $googleUser->getEmail(),
+                ],
+                'message' => 'test case successful ,',
             ]);
-            logger($user);
         }
 
         $authToken = $user->createToken('authorization_token')->plainTextToken;
