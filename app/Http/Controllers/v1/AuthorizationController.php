@@ -71,7 +71,7 @@ class AuthorizationController extends Controller
                     'postal_code' => '10001',
                     'email' => $googleUser->getEmail(),
                 ],
-                'message' => 'test case successful',
+                'message' => 'test case successful ,',
             ]);
         }
 
