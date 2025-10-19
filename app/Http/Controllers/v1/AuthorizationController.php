@@ -44,40 +44,22 @@ class AuthorizationController extends Controller
     try {
         $googleUser = Socialite::driver('google')->stateless()->userFromToken($token);
 
-        logger($googleUser);
+        logger('Google user data: ' . json_encode($googleUser));
 
         $user = User::where('email', $googleUser->getEmail())->first();
 
-
-
         if (!$user) {
-            // $user = User::create([
-            //     'first_name' => 'John',
-            //     'last_name' => 'Doe',
-            //     'phone' => '+2348100000000',
-            //     'postal_code' => '10001',
-            //     'email' => $googleUser->getEmail(),
-            //     'password' => Hash::make(Str::random(24)),
-            //     'phone_verified_at' => now(),
-            // ]);
-            // logger($user);
-            return response()->json([
-                'success' => true,
-                'token' => '1234567890',
-                'user' => [
-                    'first_name' => 'John',
-                    'last_name' => 'Doe',
-                    'phone' => '+2348100000000',
-                    'postal_code' => '10001',
-                    'email' => $googleUser->getEmail(),
-                ],
-                'message' => 'test case successful ,',
+            $user = User::create([
+                'first_name' => $googleUser->user['given_name'] ?? '',
+                'last_name' => $googleUser->user['family_name'] ?? '',
+                'email' => $googleUser->getEmail(),
+                'phone' => '+1234567890', 
+                'postal_code' => 'K1A 0A6', 
+                'password' => Hash::make(Str::random(24)),
             ]);
         }
 
         $authToken = $user->createToken('authorization_token')->plainTextToken;
-
-        logger($authToken);
 
         return response()->json([
             'success' => true,
@@ -86,7 +68,7 @@ class AuthorizationController extends Controller
             'message' => 'Google login successful',
         ]);
     } catch (\Exception $e) {
-        logger($e->getMessage());
+        logger('Google login error: ' . $e->getMessage());
         return response()->json([
             'success' => false,
             'message' => 'Failed to authenticate Google user',
