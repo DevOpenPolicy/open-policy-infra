@@ -110,6 +110,6 @@ class PopulatePoliticianActivity extends Command
                 }
             }
         });
-        $this->info('Politician activity populated successfully.');
+        // $this->info('Politician activity populated successfully.');
     }
 }

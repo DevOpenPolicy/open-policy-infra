@@ -6,5 +6,5 @@ use Illuminate\Database\Eloquent\Model;
 
 class CommitteeYearLogData extends Model
 {
-    //
+    protected $guarded = [];
 }

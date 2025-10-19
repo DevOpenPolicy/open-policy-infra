@@ -13,6 +13,3 @@ require __DIR__.'/v1/admin.php';
 // route for web info
 require __DIR__.'/v1/web.php';
 
-// Route::post('/upload-db', [DeveloperController::class, 'uploadDb']);
-
-

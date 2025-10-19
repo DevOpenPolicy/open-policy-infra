@@ -31,7 +31,7 @@ class BillController extends Controller
         
         $data = Cache::remember("web_bills_page_{$search}_{$bill_search}_{$session_search}", now()->addDays(7), function () use ($search, $bill_search,$session_search) {
             $bills = Bill::select('bills.id','bills.introduced','bills.number','bills.name','bills.short_name','bills.bills_json','politicians.name AS politician')
-                ->join('politicians', 'bills.politician', '=', 'politicians.politician_url')
+                ->leftJoin('politicians', 'bills.politician', '=', 'politicians.politician_url')
                 ->where(function ($query) use ($search) {
                     $query
                         ->where('bills.name', 'like', "%{$search}%")
@@ -77,7 +77,7 @@ class BillController extends Controller
                 'politicians.id as politician_id',
                 'politicians.party_short_name as party_short_name'
             )
-            ->join('politicians', 'bills.politician', '=', 'politicians.politician_url')
+            ->leftJoin('politicians', 'bills.politician', '=', 'politicians.politician_url')
             ->where('bills.id', $id)
             ->first();
             

@@ -25,29 +25,13 @@ class PopulatePoliticianProvince extends Command
      */
     public function handle()
     {
-        $provinces = [
-            ['Alberta', 'AB'],
-            ['British Columbia', 'BC'],
-            ['Manitoba', 'MB'],
-            ['New Brunswick', 'NB'],
-            ['Newfoundland and Labrador', 'NL'],
-            ['Northwest Territories', 'NT'],
-            ['Nova Scotia', 'NS'],
-            ['Nunavut', 'NU'],
-            ['Ontario', 'ON'],
-            ['Prince Edward Island', 'PE'],
-            ['Quebec', 'QC'],
-            ['Saskatchewan', 'SK'],
-            ['Yukon', 'YT']
-        ];
+        $provinces = [['Alberta', 'AB'], ['British Columbia', 'BC'], ['Manitoba', 'MB'], ['New Brunswick', 'NB'], ['Newfoundland and Labrador', 'NL'], ['Northwest Territories', 'NT'], ['Nova Scotia', 'NS'], ['Nunavut', 'NU'], ['Ontario', 'ON'], ['Prince Edward Island', 'PE'], ['Quebec', 'QC'], ['Saskatchewan', 'SK'], ['Yukon', 'YT']];
 
         foreach ($provinces as $province) {
-            \App\Models\PoliticianProvince::create([
-                'name' => $province[0],
-                'short_name' => $province[1]
-            ]);
+            \App\Models\PoliticianProvince::updateOrCreate(
+                ['short_name' => $province[1]], // lookup condition
+                ['name' => $province[0], 'short_name' => $province[1]], // update if exists
+            );
         }
-
-        $this->info('Politician provinces populated successfully.');
     }
 }

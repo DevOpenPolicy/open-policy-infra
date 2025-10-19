@@ -8,7 +8,9 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('admin/v1')
-    ->middleware(['auth:sanctum', AdminMiddleware::class])
+    ->middleware(['auth:sanctum', 
+    // AdminMiddleware::class
+    ])
     ->group(function () {
 
     Route::prefix('users')->group(function () {
