@@ -44,6 +44,8 @@ class AuthorizationController extends Controller
     try {
         $googleUser = Socialite::driver('google')->stateless()->userFromToken($token);
 
+        logger($googleUser);
+
         $user = User::where('email', $googleUser->getEmail())->first();
 
         if (!$user) {
@@ -54,9 +56,12 @@ class AuthorizationController extends Controller
                 'password' => Hash::make(Str::random(24)),
                 'phone_verified_at' => now(),
             ]);
+            logger($user);
         }
 
         $authToken = $user->createToken('authorization_token')->plainTextToken;
+
+        logger($authToken);
 
         return response()->json([
             'success' => true,
@@ -65,6 +70,7 @@ class AuthorizationController extends Controller
             'message' => 'Google login successful',
         ]);
     } catch (\Exception $e) {
+        logger($e->getMessage());
         return response()->json([
             'success' => false,
             'message' => 'Failed to authenticate Google user',
