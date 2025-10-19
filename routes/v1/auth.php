@@ -17,6 +17,8 @@ Route::prefix('app-auth')->group(function () {
         Route::post('/check-forgotten-email', 'check_forgotten_email');
         Route::post('/forgot-password', 'forgot_password');
         Route::post('/logout', 'logout_user')->middleware(['auth:sanctum']);
+        Route::post('/google-login', 'googleLogin');
+        Route::post('/facebook-login', 'facebookLogin');
     });
 
     Route::prefix('otp')->controller(OneTimePinController::class)->group(function () {

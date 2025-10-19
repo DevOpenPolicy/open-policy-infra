@@ -43,6 +43,8 @@ class BillController extends Controller
             $type = 1;
         }
 
+        \Log::info('Session value in getAllBills:', ['session' => $session]);
+
         $bills = Cache::remember("app_bills_page_{$search}_{$type}_{$session}", now()->addDays(7), function () use ($search, $type, $session) {
             return Bill::select('bills.id','bills.introduced', 'bills.short_name', 'bills.name', 'bills.number', 'bills.is_government_bill', 'politicians.name as politician_name')
                 ->join('politicians', 'bills.politician', '=', 'politicians.politician_url')
