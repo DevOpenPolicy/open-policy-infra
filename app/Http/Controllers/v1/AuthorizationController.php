@@ -50,8 +50,10 @@ class AuthorizationController extends Controller
 
         if (!$user) {
             $user = User::create([
-                'first_name' => $googleUser->user['given_name'] ?? '',
-                'last_name' => $googleUser->user['family_name'] ?? '',
+                'first_name' => $googleUser->user['given_name'] ?? 'test',
+                'last_name' => $googleUser->user['family_name'] ?? 'test',
+                'phone' => $googleUser->user['phone'] ?? '+2348100000000',
+                'postal_code' => $googleUser->user['postal_code'] ?? '10001',
                 'email' => $googleUser->getEmail(),
                 'password' => Hash::make(Str::random(24)),
                 'phone_verified_at' => now(),
