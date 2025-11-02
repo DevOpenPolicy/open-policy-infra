@@ -12,6 +12,17 @@ class OpenAiController extends Controller
     public function __construct(){
         $this->chatGptClass = new ChatGptClass();
     }
+
+    public function generateBillResponseForLink($request)
+    {
+        $link = $request['link'];
+        $instruction = $request['instruction'] ?? '';
+        $response = $this->chatGptClass->generateBillResponseForLink($link, $instruction);
+        return response()->json([
+            'response' => $response
+        ]);
+    }
+
     public function generateBillResponse($request)
     {
         $billNumber = $request['bill_number'];

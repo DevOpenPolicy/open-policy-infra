@@ -79,6 +79,19 @@ class ChatController extends Controller
         }
     }
 
+    public function billChatLink(Request $request){
+
+        $validated = $request->validate([
+            'link' => 'required|string|max:500',
+            'instruction' => 'nullable|string|max:500',
+        ]);
+
+        if($this->chat_system == 'open_ai'){
+            $open_ai = new OpenAiController();
+            return $open_ai->generateBillResponseForLink($validated);
+        }
+    }
+
     public function issueChat(Request $request){
         $validated = $request->validate([
             'id' => 'required|string|max:20',

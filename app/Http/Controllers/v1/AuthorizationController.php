@@ -59,7 +59,7 @@ class AuthorizationController extends Controller
                 'first_name' => $googleUser->user['given_name'] ?? '',
                 'last_name' => $googleUser->user['family_name'] ?? '',
                 'email' => $googleUser->getEmail(),
-                'phone' => $uniquePhone,
+                'phone' =>  $uniquePhone,
                 'postal_code' => 'K1A 0A6', 
                 'password' => Hash::make(Str::random(24)),
             ]);

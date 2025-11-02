@@ -59,6 +59,7 @@ Route::prefix('app/v1')->group(function () {
         Route::get('/get-bill', [ChatController::class, 'getBillInformation']);
         Route::get('/get-issue', [ChatController::class, 'getIssueInformation']);
         Route::post('/bill-chat', [ChatController::class, 'billChat']);
+        Route::post('/bill-chat-link', [ChatController::class, 'billChatLink']);
         Route::post('/issue-chat', [ChatController::class, 'issueChat']);
     });
 
