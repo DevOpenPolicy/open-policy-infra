@@ -44,29 +44,18 @@ class AuthorizationController extends Controller
     try {
         $googleUser = Socialite::driver('google')->stateless()->userFromToken($token);
 
-        logger('Google user data: ' . json_encode($googleUser));
-
         $user = User::where('email', $googleUser->getEmail())->first();
 
         if (!$user) {
-
-            $uniquePhone = '+1' . rand(1000000000, 9999999999);
-            while (User::where('phone', $uniquePhone)->exists()) {
-                $uniquePhone = '+1' . rand(1000000000, 9999999999);
-            }
-            
             $user = User::create([
                 'first_name' => $googleUser->user['given_name'] ?? '',
                 'last_name' => $googleUser->user['family_name'] ?? '',
                 'email' => $googleUser->getEmail(),
-                'phone' =>  $uniquePhone,
-                'postal_code' => 'K1A 0A6', 
+                'postal_code' => 'M2H2W6', 
                 'password' => Hash::make(Str::random(24)),
             ]);
         }
-
         $authToken = $user->createToken('authorization_token')->plainTextToken;
-
         return response()->json([
             'success' => true,
             'token' => $authToken,
@@ -277,6 +266,35 @@ public function facebookLogin(Request $request)
         //     'message' => 'OTP sent successfully',
         //     'can_proceed' => true
         // ], 200);
+    }
+    public function check_phone(Request $request){
+        if(!$request->phone){
+            return response()->json([
+                'success' => false,
+                'message' => 'No phone number provided',
+                'can_proceed' => false
+            ], 400);
+        }
+
+        if(!preg_match('/^\+?[0-9]{10,15}$/', $request->phone)){
+            return response()->json([
+                'success' => false,
+                'message' => 'Phone number is invalid',
+                'can_proceed' => false
+            ], 400);
+        }
+        
+        if(User::where('phone', $request->phone)->exists()){
+            return response()->json([
+                'success' => false,
+                'message' => 'Phone number already exists',
+                'can_proceed' => false
+            ], 400);
+        }
+
+        $oneTimePasswordClass = new OneTimePasswordClass();
+        return $oneTimePasswordClass->sendSmsOneTimePassword($request->phone);
+    
     }
 
     public function logout_user(Request $request){

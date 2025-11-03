@@ -58,6 +58,18 @@ class OneTimePasswordClass
                 'message' =>  'Wrong OTP',
             ]); 
         }
+
+        $user = User::where('phone', $phone)->first();
+        if(!$user){
+            return response()->json([
+                'success' => false,
+                'message' => 'User not found',
+            ]); 
+        }
+
+        $user->phone_verified_at = now();
+        $user->save();
+
         return response()->json([
             'success' => true,
             'message' => 'OTP verified successfully',

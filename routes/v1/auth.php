@@ -14,6 +14,7 @@ Route::prefix('app-auth')->group(function () {
         Route::post('/register', 'register_user');
         Route::post('/check-email', 'check_email');
         Route::post('/check-phone-postal', 'check_phone_postal');
+        Route::post('/check-phone', 'check_phone'); 
         Route::post('/check-forgotten-email', 'check_forgotten_email');
         Route::post('/forgot-password', 'forgot_password');
         Route::post('/logout', 'logout_user')->middleware(['auth:sanctum']);
