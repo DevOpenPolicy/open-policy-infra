@@ -95,6 +95,7 @@ class AdminAuthorizationController extends Controller
             'message' => 'Invalid or expired OTP'
             ], 200);
         }
+        
 
         $otp->delete();
         return response()->json([
