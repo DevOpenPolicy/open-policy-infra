@@ -38,7 +38,7 @@ class RepresentativeController extends Controller
     {
         if(!$postal_code){
             $user = Auth::user();
-            $postal_code = $user->postal_code;
+            $postal_code = $user->postal_code ?? "M2H2W6";
         }
 
         $data = Cache::remember("representative_postal_code_{$postal_code}", now()->addDays(7), function () use ($postal_code) {

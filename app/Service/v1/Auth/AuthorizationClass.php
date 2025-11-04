@@ -33,7 +33,7 @@ class AuthorizationClass
         $token = $user->createToken('authorization_token')->plainTextToken;
 
         $representativeController = new RepresentativeController();
-        $data = $representativeController->checkRepPostalCodeInformationIsCached($user->postal_code);
+        $data = $representativeController->checkRepPostalCodeInformationIsCached($user->postal_code ?? null);
 
         return response()->json([
             'success' => true,
@@ -46,30 +46,53 @@ class AuthorizationClass
     }
 
     public function register(RegisterRequest $register_request){
+        try {
+            $data = $register_request->validated();
+            
+            $userData = [
+                'first_name' => $data['first_name'],
+                'last_name' => $data['last_name'],
+                'email' => strtolower($data['email']),
+                'postal_code' => 'M2H2W6',
+                'password' => Hash::make($data['password']),
+            ];
 
-        $data = $register_request->validated();
-        $user = User::create([
-            'first_name' => $data['first_name'],
-            'last_name' => $data['last_name'],
-            'email' => strtolower($data['email']),
-            'phone' => $data['phone'],
-            'postal_code' => $data['postal_code'],
-            'password' => Hash::make($data['password']),
-            'phone_verified_at' => now(),
-        ]);
+            if (isset($data['phone']) && !empty($data['phone'])) {
+                $userData['phone'] = $data['phone'];
+            }
 
-        $token = $user->createToken('authorization_token')->plainTextToken;
+            if (isset($data['postal_code']) && !empty($data['postal_code'])) {
+                $userData['postal_code'] = $data['postal_code'];
+            }
 
-        $representativeController = new RepresentativeController();
-        $data = $representativeController->checkRepPostalCodeInformationIsCached($user->postal_code);
+            $user = User::create($userData);
+  
 
-        return response()->json([
-            'token' => $token,
-            'user' => $user,
-            'representative' => $data,
-            'success' => true,
-            'message' => 'User registered successfully'
-        ]);
+            $token = $user->createToken('authorization_token')->plainTextToken;
+
+            $representativeController = new RepresentativeController();
+            $representativeData = $user->postal_code 
+                ? $representativeController->checkRepPostalCodeInformationIsCached($user->postal_code)
+                : null;
+
+            return response()->json([
+                'token' => $token,
+                'user' => $user,
+                'representative' => $representativeData,
+                'success' => true,
+                'message' => 'User registered successfully'
+            ]);
+        } catch (\Exception $e) {
+            logger('Registration error: ' . $e->getMessage());
+            logger('Error trace: ' . $e->getTraceAsString());
+
+            
+            return response()->json([
+                'success' => false,
+                'message' => 'Registration failed',
+                'error' => $e->getMessage()
+            ], 500);
+        }
     }
 
     public function forgot_password(ForgotPasswordRequest $forgot_password_request){
@@ -84,7 +107,7 @@ class AuthorizationClass
         $token = $user->createToken('authorization_token')->plainTextToken;
 
         $representativeController = new RepresentativeController();
-        $data = $representativeController->checkRepPostalCodeInformationIsCached($user->postal_code);
+        $data = $representativeController->checkRepPostalCodeInformationIsCached($user->postal_code ?? null);
 
         return response()->json([
             'token' => $token,

@@ -3,6 +3,7 @@
 namespace App\Service\v1;
 
 use App\Http\Controllers\v1\MP\RepresentativeController;
+use App\Helper\OpenParliamentClass;
 use App\Http\Requests\ChangePasswordRequest;
 use App\Http\Requests\ChangePostalCodeRequest;
 use App\Http\Requests\DeleteUserAccountRequest;
@@ -44,9 +45,9 @@ class UserProfileClass
     public function changeUserPassword(ChangePasswordRequest $change_password_request){
         $user = Auth::user();
 
-        if (!Hash::check($change_password_request->old_password, $user->password)) {
-            return response()->json(['message' => 'Invalid current password'], 401);
-        }
+        // if (!Hash::check($change_password_request->old_password, $user->password)) {
+        //     return response()->json(['message' => 'Invalid current password'], 401);
+        // }
 
         User::where('id', $user->id)->update([
             'password' => Hash::make($change_password_request->password),
@@ -61,9 +62,21 @@ class UserProfileClass
     public function changePostalCode(ChangePostalCodeRequest $change_postal_code_request){
         $user = Auth::user();
 
+
+        $representative = (new OpenParliamentClass)->getPolicyInformation('/search?q=' . $change_postal_code_request->postal_code);
+        if(!$representative){
+            return response()->json([
+                'success' => false,
+                'message' => 'Postal code is invalid',
+                'can_proceed' => false
+            ], 400);
+        }
+
         User::where('id', $user->id)->update([
             'postal_code' => $change_postal_code_request->postal_code,
         ]);
+
+
 
         $representativeController = new RepresentativeController();
         $data = $representativeController->checkRepPostalCodeInformationIsCached($change_postal_code_request->postal_code);
