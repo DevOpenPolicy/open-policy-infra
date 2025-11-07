@@ -93,8 +93,8 @@ public function facebookLogin(Request $request)
                 'first_name' => $facebookUser->user['first_name'] ?? '',
                 'last_name' => $facebookUser->user['last_name'] ?? '',
                 'email' => $facebookUser->getEmail(),
-                'password' => Hash::make(Str::random(16)),
-                'phone_verified_at' => now(),
+                'postal_code' => 'M2H2W6', 
+                'password' => Hash::make(Str::random(24)),
             ]);
         }
 
