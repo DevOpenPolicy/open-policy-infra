@@ -76,6 +76,8 @@ public function facebookLogin(Request $request)
 {
     $token = $request->input('access_token');
 
+    logger('Facebook login token: ' . $token);
+
     if (!$token) {
         return response()->json([
             'success' => false,
@@ -85,14 +87,57 @@ public function facebookLogin(Request $request)
 
     try {
         $facebookUser = Socialite::driver('facebook')->stateless()->userFromToken($token);
+        
+        // Log comprehensive Facebook user data for debugging
+        logger('=== Facebook User Data ===', [
+            'id' => $facebookUser->getId(),
+            'nickname' => $facebookUser->getNickname(),
+            'name' => $facebookUser->getName(),
+            'email' => $facebookUser->getEmail(),
+            'avatar' => $facebookUser->getAvatar(),
+        ]);
+        
+        // Log raw data from Facebook
+        logger('=== Facebook Raw User Array ===', [
+            'user' => $facebookUser->user ?? 'not set',
+        ]);
+        
+        // Log attributes if available
+        if (isset($facebookUser->attributes)) {
+            logger('=== Facebook User Attributes ===', [
+                'attributes' => $facebookUser->attributes,
+            ]);
+        }
+        
+        // Log token information
+        logger('=== Facebook Token Info ===', [
+            'token' => $facebookUser->token ?? 'not set',
+            'refreshToken' => $facebookUser->refreshToken ?? 'not set',
+            'expiresIn' => $facebookUser->expiresIn ?? 'not set',
+        ]);
+        
+        // Log all available methods/data by accessing the user property directly
+        if (property_exists($facebookUser, 'user') && is_array($facebookUser->user)) {
+            logger('=== Complete Facebook User Data Structure ===', $facebookUser->user);
+        }
 
-        $user = User::where('email', $facebookUser->getEmail())->first();
+        $email = $facebookUser->getEmail();
+        
+        if (!$email) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Email is required but not provided by Facebook. Please ensure your Facebook account has an email and you have granted email permission.',
+                'error' => 'Email not available from Facebook user data',
+            ], 400);
+        }
+
+        $user = User::where('email', $email)->first();
 
         if (!$user) {
             $user = User::create([
                 'first_name' => $facebookUser->user['first_name'] ?? '',
                 'last_name' => $facebookUser->user['last_name'] ?? '',
-                'email' => $facebookUser->getEmail(),
+                'email' => $email,
                 'postal_code' => 'M2H2W6', 
                 'password' => Hash::make(Str::random(24)),
             ]);
@@ -107,6 +152,9 @@ public function facebookLogin(Request $request)
             'message' => 'Facebook login successful',
         ]);
     } catch (\Exception $e) {
+        logger('Facebook login error: ' . $e->getMessage(), [
+            'trace' => $e->getTraceAsString(),
+        ]);
         return response()->json([
             'success' => false,
             'message' => 'Facebook authentication failed',
