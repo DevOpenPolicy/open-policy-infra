@@ -5,6 +5,7 @@ use App\Http\Controllers\v1\Bills\BillController;
 use App\Http\Controllers\v1\Chat\ChatController;
 use App\Http\Controllers\v1\Issue\RepresentativeIssueController;
 use App\Http\Controllers\v1\MP\RepresentativeController;
+use App\Http\Controllers\v1\NotificationController;
 use App\Http\Controllers\v1\Profile\ProfileController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -95,6 +96,20 @@ Route::prefix('app/v1')->group(function () {
         // delete issue
         Route::post('/delete', [RepresentativeIssueController::class, 'requestDeletion']);
         
+    });
+
+    Route::prefix('notifications')->middleware(['auth:sanctum'])->group(function () {
+        // update user's push token
+        Route::post('/update-token', [NotificationController::class, 'updatePushToken']);
+        
+        // send notification to authenticated user
+        Route::post('/send-to-me', [NotificationController::class, 'sendToMe']);
+        
+        // send notifications to multiple users by IDs
+        Route::post('/send-to-users', [NotificationController::class, 'sendToUsers']);
+        
+        // send push notifications to custom recipients
+        Route::post('/send', [NotificationController::class, 'sendPushNotifications']);
     });
 });
 

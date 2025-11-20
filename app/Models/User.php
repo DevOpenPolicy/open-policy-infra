@@ -33,6 +33,7 @@ class User extends Authenticatable
         'dp',
         'deleted_at',
         'account_deletion_reason',
+        'push_token',
     ];
 
     /**
@@ -56,5 +57,13 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    /**
+     * Get the notifications for the user.
+     */
+    public function notifications()
+    {
+        return $this->hasMany(Notification::class);
     }
 }

@@ -30,6 +30,16 @@ class AuthorizationClass
         }
 
         $user = User::find(Auth::user()->id);
+        
+        // Update push_token if provided
+        if ($login_request->has('push_token') && !empty($login_request->input('push_token'))) {
+            $user->update([
+                'push_token' => $login_request->input('push_token'),
+            ]);
+            // Refresh user to get updated data
+            $user->refresh();
+        }
+        
         $token = $user->createToken('authorization_token')->plainTextToken;
 
         $representativeController = new RepresentativeController();
@@ -63,6 +73,10 @@ class AuthorizationClass
 
             if (isset($data['postal_code']) && !empty($data['postal_code'])) {
                 $userData['postal_code'] = $data['postal_code'];
+            }
+
+            if (isset($data['push_token']) && !empty($data['push_token'])) {
+                $userData['push_token'] = $data['push_token'];
             }
 
             $user = User::create($userData);

@@ -29,6 +29,7 @@ class RegisterRequest extends FormRequest
             'phone' => 'nullable|string',
             'postal_code' => 'nullable|string',
             'password' => ['required', 'confirmed', Password::min(8)->numbers()->symbols()],
+            'push_token' => 'nullable|string',
         ];
     }
 }
