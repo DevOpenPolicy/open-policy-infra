@@ -7,6 +7,8 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\ForgotPasswordRequest;
 use App\Http\Requests\LoginRequest;
 use App\Http\Requests\RegisterRequest;
+use App\Http\Requests\GoogleLoginRequest;
+use App\Http\Requests\FacebookLoginRequest;
 use App\Models\Otp;
 use App\Models\User;
 use App\Service\v1\Auth\AuthorizationClass;
@@ -37,7 +39,7 @@ class AuthorizationController extends Controller
         return $this->authorization_class->forgot_password($request);
     }
 
-    public function googleLogin(Request $request)
+    public function googleLogin(GoogleLoginRequest $request)
 {
     $token = $request->input('access_token');
 
@@ -47,13 +49,27 @@ class AuthorizationController extends Controller
         $user = User::where('email', $googleUser->getEmail())->first();
 
         if (!$user) {
-            $user = User::create([
+            $userData = [
                 'first_name' => $googleUser->user['given_name'] ?? '',
                 'last_name' => $googleUser->user['family_name'] ?? '',
                 'email' => $googleUser->getEmail(),
                 'postal_code' => 'M2H2W6', 
                 'password' => Hash::make(Str::random(24)),
-            ]);
+            ];
+
+            if ($request->has('push_token') && !empty($request->input('push_token'))) {
+                $userData['push_token'] = $request->input('push_token');
+            }
+
+            $user = User::create($userData);
+        } else {
+            // Update push_token if provided for existing user
+            if ($request->has('push_token') && !empty($request->input('push_token'))) {
+                $user->update([
+                    'push_token' => $request->input('push_token'),
+                ]);
+                $user->refresh();
+            }
         }
         $authToken = $user->createToken('authorization_token')->plainTextToken;
         return response()->json([
@@ -72,7 +88,7 @@ class AuthorizationController extends Controller
     }
 }
 
-public function facebookLogin(Request $request)
+public function facebookLogin(FacebookLoginRequest $request)
 {
     $token = $request->input('access_token');
 
@@ -134,13 +150,27 @@ public function facebookLogin(Request $request)
         $user = User::where('email', $email)->first();
 
         if (!$user) {
-            $user = User::create([
+            $userData = [
                 'first_name' => $facebookUser->user['first_name'] ?? '',
                 'last_name' => $facebookUser->user['last_name'] ?? '',
                 'email' => $email,
                 'postal_code' => 'M2H2W6', 
                 'password' => Hash::make(Str::random(24)),
-            ]);
+            ];
+
+            if ($request->has('push_token') && !empty($request->input('push_token'))) {
+                $userData['push_token'] = $request->input('push_token');
+            }
+
+            $user = User::create($userData);
+        } else {
+            // Update push_token if provided for existing user
+            if ($request->has('push_token') && !empty($request->input('push_token'))) {
+                $user->update([
+                    'push_token' => $request->input('push_token'),
+                ]);
+                $user->refresh();
+            }
         }
 
         $authToken = $user->createToken('authorization_token')->plainTextToken;
