@@ -50,4 +50,15 @@ return [
     'redirect' => env('FACEBOOK_REDIRECT_URL'),
 ],
 
+'pusher' => [
+    'app_id' => env('PUSHER_APP_ID'),
+    'key' => env('PUSHER_APP_KEY'),
+    'secret' => env('PUSHER_APP_SECRET'),
+    'cluster' => env('PUSHER_APP_CLUSTER'),
+    'host' => env('PUSHER_HOST') ?: 'api-'.env('PUSHER_APP_CLUSTER', 'mt1').'.pusher.com',
+    'port' => env('PUSHER_PORT', 443),
+    'scheme' => env('PUSHER_SCHEME', 'https'),
+    'encrypted' => true,
+],
+
 ];
