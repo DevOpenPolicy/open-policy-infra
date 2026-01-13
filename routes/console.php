@@ -26,17 +26,17 @@ Artisan::command('generate:mp', function () {
     $this->comment('completed MP update');
 })->purpose('Update MPs');
 
-Artisan::command('generate:bills', function () {
-    $this->comment('starting Bill update');
-    GenerateContentClass::generateBill();
-    $this->comment('completed Bill update');
-})->purpose('Update Bills');
-
 Artisan::command('check:former-mp', function () {
     $this->comment('start MP Former check update');
     (new CheckIsFormerMp())->handle();
     $this->comment('ending MP Former check update');
 })->purpose('Check and update former MPs');
+
+Artisan::command('generate:bills', function () {
+    $this->comment('starting Bill update');
+    GenerateContentClass::generateBill();
+    $this->comment('completed Bill update');
+})->purpose('Update Bills');
 
 Artisan::command('generate:bill-summaries', function () {
     $this->comment('start bill summary update');
@@ -71,8 +71,8 @@ Artisan::command('generate:committees', function () {
 Artisan::command('generate:all-data', function () {
     $this->comment('started');
     Artisan::call('generate:mp');
-    Artisan::call('generate:bills');
     Artisan::call('check:former-mp');
+    Artisan::call('generate:bills');
     Artisan::call('generate:bill-summaries');
     Artisan::call('generate:mp-activities');
     Artisan::call('generate:debates');
