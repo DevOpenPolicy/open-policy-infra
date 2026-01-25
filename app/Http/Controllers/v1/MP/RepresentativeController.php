@@ -7,6 +7,8 @@ use App\Http\Controllers\Controller;
 use App\Models\IssueVoteCast;
 use App\Models\Politicians;
 use App\Models\RepresentativeIssue;
+use App\Models\Bill;
+use App\Models\Poll;
 use App\Models\SavedIssue;
 use App\Models\User;
 use App\RoleManager;
@@ -311,4 +313,79 @@ class RepresentativeController extends Controller
             'data' => 'https://openpolicy.me/',
         ]);
     }
+
+    /**
+     * Get summary statistics for a representative.
+     * Returns postal code, constituency population, total bills, and polls created.
+     */
+    public function summary()
+    {
+        $user = Auth::user();
+
+        if (!$user) {
+            return response()->json([
+                'success' => false,
+                'message' => 'User not authenticated',
+            ], 401);
+        }
+
+        // Get total bills count
+        $totalBills = Bill::count();
+
+        // Get polls created by this user
+        $pollsCreated = Poll::where('user_id', $user->id)->count();
+
+        // Constituency population - using a placeholder value
+        // In the future, this could be fetched from an external API or stored in the database
+        $constituencyPopulation = 1200000;
+
+        return response()->json([
+            'success' => true,
+            'data' => [
+                'postal_code' => $user->postal_code ?? 'N/A',
+                'constituency_population' => $constituencyPopulation,
+                'total_bills' => $totalBills,
+                'polls_created' => $pollsCreated,
+            ],
+        ]);
+    }
+
+    /**
+     * Update the representative's profile image.
+     */
+    public function updateProfileImage(Request $request)
+    {
+        $user = Auth::user();
+
+        if (!$user) {
+            return response()->json([
+                'success' => false,
+                'message' => 'User not authenticated',
+            ], 401);
+        }
+
+        $request->validate([
+            'profile_image' => 'required|image|mimes:jpeg,png,jpg|max:5120', // 5MB max
+        ]);
+
+        if ($request->hasFile('profile_image')) {
+            $path = $request->file('profile_image')->store('profiles', 'public');
+            
+            User::where('id', $user->id)->update([
+                'dp' => asset('storage/' . $path),
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Profile image updated successfully',
+                'image_url' => asset('storage/' . $path),
+            ]);
+        }
+
+        return response()->json([
+            'success' => false,
+            'message' => 'No image file provided',
+        ], 400);
+    }
 }
+
