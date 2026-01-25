@@ -8,6 +8,7 @@ use App\Http\Controllers\v1\Issue\RepresentativeIssueController;
 use App\Http\Controllers\v1\MP\RepresentativeController;
 use App\Http\Controllers\v1\NotificationController;
 use App\Http\Controllers\v1\Profile\ProfileController;
+use App\Http\Controllers\v1\PollController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -36,6 +37,12 @@ Route::prefix('app/v1')->group(function () {
 
         //activity links
         Route::get('/activity-link', [AppLinkController::class, 'activityLink']);
+
+        // representative summary
+        Route::get('/summary', [RepresentativeController::class, 'summary'])->middleware(['auth:sanctum']);
+
+        // update profile image
+        Route::post('/update-profile-image', [RepresentativeController::class, 'updateProfileImage'])->middleware(['auth:sanctum']);
     });
 
 
@@ -109,6 +116,9 @@ Route::prefix('app/v1')->group(function () {
     Route::prefix('issue')
     ->middleware(['auth:sanctum'])
     ->group(function () {
+        // get all issues for authenticated user
+        Route::get('/', [RepresentativeIssueController::class, 'getAllIssues']);
+        
         // create issue
         Route::post('/create', [RepresentativeIssueController::class, 'createIssue']);
         
@@ -129,6 +139,14 @@ Route::prefix('app/v1')->group(function () {
         
         // send push notifications to custom recipients
         Route::post('/send', [NotificationController::class, 'sendPushNotifications']);
+    });
+    Route::prefix('polls')->middleware(['auth:sanctum'])->group(function () {
+        Route::get('/', [PollController::class, 'index']); // Get all polls
+        Route::post('/create', [PollController::class, 'store']); // Create poll
+        Route::get('/user/{userId}', [PollController::class, 'getByUser']); // Get user's polls
+        Route::post('/vote', [PollController::class, 'vote']); // Vote
+        Route::post('/update', [PollController::class, 'update']); // Edit poll
+        Route::post('/delete', [PollController::class, 'delete']); // Delete poll
     });
 });
 
