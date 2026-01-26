@@ -50,6 +50,38 @@ class RepresentativeIssueController extends Controller
         ], 200);
     }
 
+    public function getIssueById($id)
+    {
+        $user = Auth::user();
+
+        $issue = RepresentativeIssue::join('users', 'representative_issues.representative_id', '=', 'users.id')
+            ->select(
+                'representative_issues.id',
+                'representative_issues.name',
+                'representative_issues.summary',
+                'representative_issues.description',
+                'representative_issues.status',
+                'representative_issues.created_at as date',
+                'users.first_name',
+                'users.last_name'
+            )
+            ->where('representative_issues.id', $id)
+            ->where('representative_issues.representative_id', $user->id)
+            ->first();
+
+        if (!$issue) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Issue not found',
+            ], 404);
+        }
+
+        return response()->json([
+            'success' => true,
+            'data' => $issue,
+        ], 200);
+    }
+
     public function createIssue(Request $request){
         RepresentativeIssue::create([
             'representative_id' => Auth::id(),
