@@ -17,54 +17,61 @@ class GetSummaryForAllBills extends Command
     {
         $billClass = new BillClass();
 
-        // Get latest parliament session or fallback
+        // Retrieve the latest parliament session, defaulting to '45-1' if none exists
         $parliamentSession = ParliamentSession::latest()->first();
         $session = $parliamentSession->session ?? '45-1';
 
-        // Process bills in chunks
+        // Fetch bills without summaries in batches of 100 to optimize memory usage
         Bill::whereNull('summary')
             ->where('session', $session)
             ->chunk(100, function ($bills) use ($billClass) {
-                $cases = [];   // Stores WHEN clauses
-                $ids = [];     // IDs of bills to update
-                $bindings = []; // Bound values for query
+                // Arrays to build a single bulk update query using CASE WHEN
+                $cases = []; // SQL WHEN clauses for dynamic value assignment
+                $ids = []; // Bill IDs that will be updated
+                $bindings = []; // Parameter bindings for prepared statement
 
                 foreach ($bills as $bill) {
                     try {
+                        // Attempt to retrieve the bill summary from external source
                         $summary = $billClass->getBillSummary($bill->bill_url);
 
+                        // Only process if a valid summary was retrieved
                         if (!empty($summary)) {
                             $ids[] = $bill->id;
 
-                            // Build CASE WHEN for this bill
-                            $cases[] = "WHEN ? THEN ?";
+                            // Construct CASE WHEN clause with parameterized values
+                            $cases[] = 'WHEN ? THEN ?';
                             $bindings[] = $bill->id;
                             $bindings[] = $summary;
                         }
                     } catch (\Exception $e) {
-                        $this->error("Failed to fetch summary for bill ID {$bill->id}: " . $e->getMessage());
+                        logger()->error("Failed to fetch summary for bill ID {$bill->id}: " . $e->getMessage());
                     }
                 }
 
-                // Run a single bulk update if we have updates
+                // Execute bulk update if summaries were found
                 if (!empty($cases)) {
+                    // Build dynamic CASE statement with all bill updates
                     $query = "
-                        UPDATE bills 
-                        SET summary = CASE id
-                            " . implode(' ', $cases) . "
-                        END
+                        UPDATE bills
+                        SET summary = CASE id 
+                            " . implode(' ', $cases) . " 
+                            END,
+                            introduced = introduced,
+                            updated_at = NOW() 
                         WHERE id IN (" . implode(',', array_fill(0, count($ids), '?')) . ")
                     ";
 
-                    // Add ids again for the WHERE clause
+                    // Append bill IDs for WHERE clause filtering
                     $bindings = array_merge($bindings, $ids);
 
+                    // Execute the prepared statement
                     DB::update($query, $bindings);
 
-                    $this->info("✅ Updated " . count($ids) . " bills in one query.");
+                    logger('✅ Updated ' . count($ids) . ' bills in one query.');
                 }
             });
 
-        $this->info('🎉 Finished updating all bill summaries.');
+        logger('🎉 Finished updating all bill summaries.');
     }
 }

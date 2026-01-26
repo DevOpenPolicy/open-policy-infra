@@ -15,6 +15,7 @@
         "laravel/socialite": "^5.23",
         "laravel/tinker": "^2.9",
         "opcodesio/log-viewer": "^3.15",
+        "pusher/pusher-php-server": "^7.2",
         "symfony/css-selector": "^7.2",
         "symfony/dom-crawler": "^7.2",
         "twilio/sdk": "^8.6"

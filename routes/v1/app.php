@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\v1\AppLinkController;
 use App\Http\Controllers\v1\Bills\BillController;
+use App\Http\Controllers\v1\Bills\CommentController;
 use App\Http\Controllers\v1\Chat\ChatController;
 use App\Http\Controllers\v1\Issue\RepresentativeIssueController;
 use App\Http\Controllers\v1\MP\RepresentativeController;
@@ -66,6 +67,24 @@ Route::prefix('app/v1')->group(function () {
 
         //bookmark bill
         Route::post('/bookmark', [BillController::class, 'bookmarkBill'])->middleware(['auth:sanctum']);
+
+        // Comments routes
+        Route::prefix('comments')->group(function () {
+            // Get comments (public)
+            Route::get('/{billId}', [CommentController::class, 'getComments']);
+            
+            // Create comment (authenticated)
+            Route::post('/', [CommentController::class, 'createComment'])->middleware(['auth:sanctum']);
+            
+            // Update comment (authenticated)
+            Route::put('/{commentId}', [CommentController::class, 'updateComment'])->middleware(['auth:sanctum']);
+            
+            // Delete comment (authenticated)
+            Route::delete('/{commentId}', [CommentController::class, 'deleteComment'])->middleware(['auth:sanctum']);
+            
+            // React to comment (authenticated)
+            Route::post('/{commentId}/react', [CommentController::class, 'reactToComment'])->middleware(['auth:sanctum']);
+        });
     });
 
     Route::prefix('chat')->middleware(['auth:sanctum'])->group(function () {
