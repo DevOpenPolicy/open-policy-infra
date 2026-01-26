@@ -49,10 +49,15 @@ Route::prefix('app/v1')->group(function () {
         // get all bills
         Route::get('/', [BillController::class, 'getAllBills']);
 
+        // get bill by id
+        Route::get('/{id}', [BillController::class, 'getBillById']);
+
         Route::get('/user-bill', [BillController::class, 'userBills'])->middleware(['auth:sanctum']);
         
         // bill details
         Route::get('/show/{number}', [BillController::class, 'getBillNumber'])->middleware(['auth:sanctum']);
+
+
 
         Route::get('/guest-show/{number}', [BillController::class, 'getBillNumber']);
 
@@ -99,6 +104,9 @@ Route::prefix('app/v1')->group(function () {
     ->group(function () {
         // get all issues for authenticated user
         Route::get('/', [RepresentativeIssueController::class, 'getAllIssues']);
+        
+        // get issue by id
+        Route::get('/{id}', [RepresentativeIssueController::class, 'getIssueById']);
         
         // create issue
         Route::post('/create', [RepresentativeIssueController::class, 'createIssue']);

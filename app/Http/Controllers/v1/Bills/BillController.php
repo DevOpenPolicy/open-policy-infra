@@ -74,6 +74,32 @@ class BillController extends Controller
         );
     }
 
+    public function getBillById($id)
+    {
+        $bill = Bill::select('bills.id', 'bills.introduced', 'bills.short_name', 'bills.name', 'bills.number', 'bills.is_government_bill', 'bills.session', 'bills.bill_url', 'politicians.name as politician_name')
+            ->leftJoin('politicians', 'bills.politician', '=', 'politicians.politician_url')
+            ->where('bills.id', $id)
+            ->first();
+
+        if (!$bill) {
+            return response()->json(
+                [
+                    'success' => false,
+                    'message' => 'Bill not found',
+                ],
+                404,
+            );
+        }
+
+        return response()->json(
+            [
+                'success' => true,
+                'data' => $bill,
+            ],
+            200,
+        );
+    }
+
     public function userBills()
     {
         $search = request('search');
