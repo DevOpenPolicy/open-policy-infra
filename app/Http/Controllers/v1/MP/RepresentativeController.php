@@ -52,6 +52,7 @@ class RepresentativeController extends Controller
             $data->image = $this->representativeClass->getRepresentativesImage($representative);
             $data->email = $representative['email'] ?? '';
             $politician = Politicians::where('email', $data->email)->first();
+            $data->id = $politician->id ?? null;
             $data->phone = $representative['voice'] ?? '';
             $data->office = $this->representativeClass->getRepresentativeAddress($representative['other_info']['constituency_offices'][0] ?? '');
             $recent_activities = $this->representativeClass->getActivityLog($politician);
@@ -74,9 +75,9 @@ class RepresentativeController extends Controller
                 ->where('users.role', RoleManager::REPRESENTATIVE)
                 ->get();
 
-            $data->polls = $politician
-                ? Poll::where('user_id', $politician->id)->with('options')->latest()->get()
-                : collect();
+            $data->polls = Poll::whereHas('user', function ($query) use ($data) {
+                $query->where('email', $data->email);
+            })->with('options')->latest()->get();
 
             return $data;
         });
