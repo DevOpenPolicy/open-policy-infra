@@ -115,6 +115,9 @@ Route::prefix('app/v1')->group(function () {
 
         // delete account
         Route::post('/delete-account', [ProfileController::class, 'deleteAccount']);
+
+        // update profile picture
+        Route::post('/update-dp', [ProfileController::class, 'updateProfilePicture']);
     });
 
     
