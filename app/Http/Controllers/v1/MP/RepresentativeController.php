@@ -74,6 +74,10 @@ class RepresentativeController extends Controller
                 ->where('users.role', RoleManager::REPRESENTATIVE)
                 ->get();
 
+            $data->polls = $politician
+                ? Poll::where('user_id', $politician->id)->with('options')->latest()->get()
+                : collect();
+
             return $data;
         });
 
