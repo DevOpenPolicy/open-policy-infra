@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Poll;
 use App\Models\PollOption;
 use App\Models\PollVote;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
@@ -76,6 +77,25 @@ class PollController extends Controller
     {
         $polls = Poll::where('user_id', $userId)->with('options')->latest()->get();
         return response()->json($polls);
+    }
+
+    /**
+     * Get polls created by a user identified by their email.
+     */
+    public function getByEmail($email)
+    {
+        $user = User::where('email', $email)->first();
+
+        if (!$user) {
+            return response()->json(['message' => 'User not found'], 404);
+        }
+
+        $polls = Poll::where('user_id', $user->id)->with('options')->latest()->get();
+
+        return response()->json([
+            'success' => true,
+            'data' => $polls,
+        ]);
     }
 
     /**
