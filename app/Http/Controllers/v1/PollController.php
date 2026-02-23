@@ -99,6 +99,25 @@ class PollController extends Controller
     }
 
     /**
+     * Get polls created by users in a given postal code area.
+     */
+    public function getByPostalCode($postalCode)
+    {
+        $userIds = User::where('postal_code', $postalCode)->pluck('id');
+
+        if ($userIds->isEmpty()) {
+            return response()->json(['message' => 'No users found for this postal code'], 404);
+        }
+
+        $polls = Poll::whereIn('user_id', $userIds)->with('options')->latest()->get();
+
+        return response()->json([
+            'success' => true,
+            'data' => $polls,
+        ]);
+    }
+
+    /**
      * Vote on a poll option.
      */
     public function vote(Request $request)
