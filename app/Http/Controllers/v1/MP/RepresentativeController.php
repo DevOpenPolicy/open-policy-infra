@@ -53,6 +53,7 @@ class RepresentativeController extends Controller
             $data->email = $representative['email'] ?? '';
             $politician = Politicians::where('email', $data->email)->first();
             $data->id = $politician->id ?? null;
+            $data->postal_code = $postal_code;
             $data->phone = $representative['voice'] ?? '';
             $data->office = $this->representativeClass->getRepresentativeAddress($representative['other_info']['constituency_offices'][0] ?? '');
             $recent_activities = $this->representativeClass->getActivityLog($politician);
