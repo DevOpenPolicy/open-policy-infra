@@ -75,8 +75,8 @@ class RepresentativeController extends Controller
                 ->where('users.role', RoleManager::REPRESENTATIVE)
                 ->get();
 
-            $data->polls = Poll::whereHas('user', function ($query) use ($data) {
-                $query->where('email', $data->email);
+            $data->polls = Poll::whereHas('user', function ($query) use ($postal_code) {
+                $query->where('postal_code', $postal_code);
             })->with('options')->latest()->get();
 
             return $data;

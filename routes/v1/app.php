@@ -156,6 +156,7 @@ Route::prefix('app/v1')->group(function () {
         Route::post('/create', [PollController::class, 'store']); // Create poll
         Route::get('/user/{userId}', [PollController::class, 'getByUser']); // Get user's polls
         Route::get('/by-email/{email}', [PollController::class, 'getByEmail']); // Get polls by user email
+        Route::get('/by-postal-code/{postalCode}', [PollController::class, 'getByPostalCode']); // Get polls by postal code
         Route::post('/vote', [PollController::class, 'vote']); // Vote
         Route::post('/update', [PollController::class, 'update']); // Edit poll
         Route::post('/delete', [PollController::class, 'delete']); // Delete poll
