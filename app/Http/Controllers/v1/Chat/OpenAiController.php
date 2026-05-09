@@ -48,4 +48,14 @@ class OpenAiController extends Controller
             'response' => $response
         ]);
     }
+
+    public function generateAceResponse($request)
+    {
+        $messages = $request['messages'];
+        $response = $this->chatGptClass->generateAceResponse($messages);
+
+        return response()->json([
+            'reply' => $response
+        ]);
+    }
 }

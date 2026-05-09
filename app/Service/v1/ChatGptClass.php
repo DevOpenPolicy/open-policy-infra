@@ -178,4 +178,33 @@ class ChatGptClass
 
         return $body['choices'][0]['message']['content'] ?? 'No response generated.';
     }
+    public function generateAceResponse(array $messages): string
+    {
+        $systemMessage = "You are Ace, an intelligent policy research companion. You help users understand legislation, policy, and bills. Be professional, concise, and informative.";
+
+        $formattedMessages = [['role' => 'system', 'content' => $systemMessage]];
+        foreach ($messages as $message) {
+            $formattedMessages[] = [
+                'role' => $message['role'],
+                'content' => $message['content']
+            ];
+        }
+
+        $response = $this->client->post('https://api.openai.com/v1/chat/completions', [
+            'headers' => [
+                'Authorization' => 'Bearer ' . $this->apiKey,
+                'Content-Type' => 'application/json',
+            ],
+            'json' => [
+                'model' => 'gpt-3.5-turbo',
+                'messages' => $formattedMessages,
+                'temperature' => 0.7,
+                'max_tokens' => 1000,
+            ]
+        ]);
+
+        $body = json_decode($response->getBody(), true);
+
+        return $body['choices'][0]['message']['content'] ?? 'No response generated.';
+    }
 }

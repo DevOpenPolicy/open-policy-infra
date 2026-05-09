@@ -34,7 +34,14 @@ class User extends Authenticatable
         'deleted_at',
         'account_deletion_reason',
         'push_token',
+        'onboarding_completed',
+        'organization_id',
     ];
+
+    public function organization()
+    {
+        return $this->hasOne(Organization::class);
+    }
 
     /**
      * The attributes that should be hidden for serialization.
