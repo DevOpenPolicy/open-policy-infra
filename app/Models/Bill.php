@@ -13,7 +13,7 @@ class Bill extends Model
         'short_name',
         'name',
         'number',
-        'politician_id',
+        'politician',
         'bill_url',
         'is_government_bill',
         'bills_json',

@@ -7,6 +7,7 @@ use App\Models\Bill;
 use App\Models\Notification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 
 class DashboardController extends Controller
@@ -35,10 +36,110 @@ class DashboardController extends Controller
 
         // 4. Policy Alerts (Unread notifications)
         $unreadAlertsCount = 0;
+        $recentAlerts = [];
+        $relevantBills = [];
+        $highImpactBills = [];
+        $industryKeywords = [
+            'Fintech' => ['financial', 'bank', 'credit', 'tax', 'payment', 'money', 'investment'],
+            'Healthcare' => ['health', 'medical', 'hospital', 'drug', 'pharmaceutical', 'care'],
+            'Energy' => ['energy', 'oil', 'gas', 'climate', 'environment', 'electricity', 'nuclear'],
+            'Tech' => ['technology', 'digital', 'internet', 'data', 'privacy', 'artificial intelligence', 'software'],
+            'Telecom' => ['telecom', 'broadcasting', 'spectrum', 'communication', 'phone']
+        ];
+
         if ($user) {
             $unreadAlertsCount = Notification::where('user_id', $user->id)
                 ->where('is_read', false)
                 ->count();
+            
+            $recentAlerts = Notification::where('user_id', $user->id)
+                ->latest()
+                ->limit(5)
+                ->get()
+                ->map(function($n) {
+                    return [
+                        'id' => $n->id,
+                        'alert_type' => 'new_bill', // Default for now
+                        'title' => $n->title,
+                        'message' => $n->message,
+                        'created_at' => $n->created_at->toIso8601String(),
+                    ];
+                });
+
+            // Logic for Relevant Bills based on Industry
+            $organization = $user->organization ?: \App\Models\Organization::where('user_id', $user->id)->first();
+            if ($organization && !empty($organization->industries)) {
+                $keywords = [];
+                foreach ($organization->industries as $ind) {
+                    if (isset($industryKeywords[$ind])) {
+                        $keywords = array_merge($keywords, $industryKeywords[$ind]);
+                    } else {
+                        $keywords[] = strtolower($ind);
+                    }
+                }
+
+                $relevantBills = Bill::where(function($query) use ($keywords) {
+                    foreach ($keywords as $kw) {
+                        $query->orWhere('name', 'like', "%{$kw}%")
+                              ->orWhere('short_name', 'like', "%{$kw}%");
+                    }
+                })
+                ->limit(3)
+                ->get()
+                ->map(function($b) {
+                    return [
+                        'id' => $b->id,
+                        'status' => 'active',
+                        'billNumber' => $b->number,
+                        'title' => $b->short_name ?: $b->name,
+                        'summary' => $b->name,
+                    ];
+                });
+            }
+        }
+
+        // High Impact Policies (Simulated for now - maybe government bills)
+        $highImpactBills = Bill::where('is_government_bill', 1)
+            ->latest('introduced')
+            ->limit(5)
+            ->get()
+            ->map(function($b) {
+                return [
+                    'id' => $b->id,
+                    'title' => $b->short_name ?: $b->name,
+                    'risk_level' => 'medium',
+                    'industry' => 'General',
+                ];
+            });
+
+        // Activity Trend (Last 6 months)
+        $activityTrend = [];
+        for ($i = 5; $i >= 0; $i--) {
+            $month = Carbon::now()->subMonths($i);
+            $count = Bill::whereYear('introduced', $month->year)
+                ->whereMonth('introduced', $month->month)
+                ->count();
+            
+            $activityTrend[] = [
+                'month' => $month->format('M'),
+                'bills' => $count,
+            ];
+        }
+
+        // Industry Activity
+        $industryActivity = [];
+        foreach ($industryKeywords as $industry => $keywords) {
+            $count = Bill::where(function($query) use ($keywords) {
+                foreach ($keywords as $kw) {
+                    $query->orWhere('name', 'like', "%{$kw}%")
+                          ->orWhere('short_name', 'like', "%{$kw}%");
+                }
+            })->count();
+
+            $industryActivity[] = [
+                'industry' => $industry,
+                'count' => $count,
+            ];
         }
 
         return response()->json([
@@ -50,9 +151,11 @@ class DashboardController extends Controller
                     'passedBills' => $billsPassedCount,
                     'alertCount' => $unreadAlertsCount,
                 ],
-                'relevantBills' => [], // Placeholder for future logic
-                'highImpactBills' => [], // Placeholder for future logic
-                'recentAlerts' => [], // Placeholder for future logic
+                'relevantBills' => $relevantBills,
+                'highImpactBills' => $highImpactBills,
+                'recentAlerts' => $recentAlerts,
+                'activityTrend' => $activityTrend,
+                'industryActivity' => $industryActivity,
             ]
         ]);
     }

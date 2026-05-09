@@ -30,11 +30,41 @@ class ChatController extends Controller
 
             $data = Bill::select('bills.id', 'bills.introduced', 'bills.short_name', 'bills.name', 'bills.number', 'bills.is_government_bill', 'bills.session', 'bills.bill_url', 'politicians.name as politician_name')
                 ->leftJoin('politicians', 'bills.politician', '=', 'politicians.politician_url')
-                ->where('bills.session', '45-1')
                 ->where('bills.number', $number)
                 ->first();
 
-            $data->summary = $this->billClass->getBillSummary($data->bill_url);
+            if($data){
+                $data->summary = $this->billClass->getBillSummary($data->bill_url);
+            }
+            return $data;
+        });
+
+        return response()->json([
+            'success' => true,
+            'data' => $chat_info
+        ], 200);
+    }
+
+    public function getBillInformationById(){
+        $id = request('bill_id');
+
+
+        $chat_info = Cache::remember("chat_bill_id_{$id}", now()->addDays(7), function () use ($id) {
+            $data = Cache::get("bill_id_{$id}");
+            if($data) return $data;
+
+
+            $data = Bill::select('bills.id', 'bills.introduced', 'bills.short_name', 'bills.name', 'bills.number', 'bills.is_government_bill', 'bills.session', 'bills.bill_url', 'politicians.name as politician_name')
+                ->leftJoin('politicians', 'bills.politician', '=', 'politicians.politician_url')
+                ->where(function($query) use ($id) {
+                    $query->where('bills.id', $id)
+                          ->orWhere('bills.number', $id);
+                })
+                ->first();
+
+            if($data){
+                $data->summary = $this->billClass->getBillSummary($data->bill_url);
+            }
             return $data;
         });
 
