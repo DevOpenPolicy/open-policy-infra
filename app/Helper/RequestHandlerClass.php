@@ -26,8 +26,8 @@ class RequestHandlerClass
     }
 
     public static function findXmlUrlFromParlPage($url){
-        $html = file_get_contents($url);
-        if (!$html) return null;
+        $html = @file_get_contents($url);
+        if (!$html || $html === false) return null;
 
         $dom = new DOMDocument();
         @$dom->loadHTML($html);
@@ -43,8 +43,8 @@ class RequestHandlerClass
     }
 
     public static function findXmlUrlFromCommonsPage($url){
-        $html = file_get_contents($url);
-        if (!$html) return null;
+        $html = @file_get_contents($url);
+        if (!$html || $html === false) return null;
 
         $dom = new DOMDocument();
         @$dom->loadHTML($html);
@@ -62,7 +62,15 @@ class RequestHandlerClass
     public static function readHtmlForSummary($url){
         $url = 'https://openparliament.ca'.$url;
 
-        $html = file_get_contents($url);
+        $html = @file_get_contents($url);
+        
+        if ($html === false) {
+            return "Summary currently unavailable.";
+        }
+        
+        if (!$html) {
+            return "No content found at URL.";
+        }
         
         $dom = new DOMDocument();
         libxml_use_internal_errors(true); // Suppress HTML warnings
