@@ -394,4 +394,91 @@ class BillController extends Controller
             200,
         );
     }
+
+    /**
+     * Toggle saving a bill for the authenticated user.
+     */
+    public function toggleSaveBill(Request $request)
+    {
+        $request->validate([
+            'bill_id' => 'required|exists:bills,id'
+        ]);
+
+        $user = Auth::user();
+        $bill = Bill::findOrFail($request->bill_id);
+        
+        $savedBill = SavedBill::where('user_id', $user->id)
+            ->where('bill_url', $bill->bill_url)
+            ->first();
+
+        if ($savedBill) {
+            $savedBill->is_saved = !$savedBill->is_saved;
+            $savedBill->save();
+        } else {
+            $savedBill = SavedBill::create([
+                'user_id' => $user->id,
+                'bill_url' => $bill->bill_url,
+                'session' => $bill->session,
+                'is_saved' => true,
+            ]);
+        }
+
+        // Clear cache
+        Cache::forget("users_{$user->id}_bookmark_{$bill->id}");
+        Cache::forget("users_{$user->id}_bookmark_{$bill->number}");
+
+        return response()->json([
+            'success' => true,
+            'is_saved' => (bool)$savedBill->is_saved,
+            'message' => $savedBill->is_saved ? 'Bill saved successfully' : 'Bill removed from saved'
+        ]);
+    }
+
+    /**
+     * Get all bills saved by the authenticated user.
+     */
+    public function getSavedBills()
+    {
+        $user = Auth::user();
+        $search = request('search');
+
+        $bills = SavedBill::where('saved_bills.is_saved', 1)
+            ->where('saved_bills.user_id', $user->id)
+            ->join('bills', 'saved_bills.bill_url', '=', 'bills.bill_url')
+            ->leftJoin('politicians', 'bills.politician', '=', 'politicians.politician_url')
+            ->select('bills.id', 'bills.introduced', 'bills.short_name', 'bills.name', 'bills.number', 'bills.is_government_bill', 'politicians.name as politician_name')
+            ->where(function ($query) use ($search) {
+                if ($search) {
+                    $query->where('bills.name', 'like', "%{$search}%")
+                        ->orWhere('bills.short_name', 'like', "%{$search}%")
+                        ->orWhere('bills.number', 'like', "%{$search}%");
+                }
+            })
+            ->orderBy('saved_bills.created_at', 'desc')
+            ->get();
+
+        return response()->json([
+            'success' => true,
+            'data' => $bills
+        ]);
+    }
+
+    /**
+     * Check if a specific bill is saved by the user.
+     */
+    public function checkIsSaved($id)
+    {
+        $user = Auth::user();
+        $bill = Bill::findOrFail($id);
+
+        $saved = SavedBill::where('user_id', $user->id)
+            ->where('bill_url', $bill->bill_url)
+            ->where('is_saved', 1)
+            ->exists();
+
+        return response()->json([
+            'success' => true,
+            'is_saved' => $saved
+        ]);
+    }
 }

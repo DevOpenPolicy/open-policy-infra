@@ -3,10 +3,12 @@
 use App\Http\Controllers\v1\AppLinkController;
 use App\Http\Controllers\v1\Bills\BillController;
 use App\Http\Controllers\v1\Bills\CommentController;
+use App\Http\Controllers\v1\Bills\DashboardController;
 use App\Http\Controllers\v1\Chat\ChatController;
 use App\Http\Controllers\v1\Issue\RepresentativeIssueController;
 use App\Http\Controllers\v1\MP\RepresentativeController;
 use App\Http\Controllers\v1\NotificationController;
+use App\Http\Controllers\v1\Organization\OrganizationController;
 use App\Http\Controllers\v1\Profile\ProfileController;
 use App\Http\Controllers\v1\PollController;
 use Illuminate\Http\Request;
@@ -50,6 +52,9 @@ Route::prefix('app/v1')->group(function () {
         // get all bills
         Route::get('/', [BillController::class, 'getAllBills']);
 
+        Route::get('/saved', [BillController::class, 'getSavedBills'])->middleware(['auth:sanctum']);
+        Route::get('/check-saved/{id}', [BillController::class, 'checkIsSaved'])->middleware(['auth:sanctum']);
+
         // get bill by id
         Route::get('/{id}', [BillController::class, 'getBillById']);
 
@@ -67,6 +72,7 @@ Route::prefix('app/v1')->group(function () {
 
         //bookmark bill
         Route::post('/bookmark', [BillController::class, 'bookmarkBill'])->middleware(['auth:sanctum']);
+        Route::post('/toggle-save', [BillController::class, 'toggleSaveBill'])->middleware(['auth:sanctum']);
 
         // Comments routes
         Route::prefix('comments')->group(function () {
@@ -92,6 +98,7 @@ Route::prefix('app/v1')->group(function () {
         Route::get('/get-issue', [ChatController::class, 'getIssueInformation']);
         Route::post('/bill-chat', [ChatController::class, 'billChat']);
         Route::post('/bill-chat-link', [ChatController::class, 'billChatLink']);
+        Route::post('/ace', [ChatController::class, 'aceChat']);
         Route::post('/issue-chat', [ChatController::class, 'issueChat']);
     });
 
@@ -160,6 +167,16 @@ Route::prefix('app/v1')->group(function () {
         Route::post('/vote', [PollController::class, 'vote']); // Vote
         Route::post('/update', [PollController::class, 'update']); // Edit poll
         Route::post('/delete', [PollController::class, 'delete']); // Delete poll
+    });
+
+    Route::prefix('dashboard')->middleware(['auth:sanctum'])->group(function () {
+        Route::get('/summary', [DashboardController::class, 'getSummary']);
+    });
+
+    Route::prefix('organization')->middleware(['auth:sanctum'])->group(function () {
+        Route::get('/current', [OrganizationController::class, 'getCurrent']);
+        Route::post('/create', [OrganizationController::class, 'create']);
+        Route::patch('/current', [OrganizationController::class, 'update']);
     });
 });
 

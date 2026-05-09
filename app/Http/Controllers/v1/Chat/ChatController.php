@@ -28,7 +28,7 @@ class ChatController extends Controller
             if($data) return $data;
 
 
-            $data = Bill::select('bills.*', 'politicians.name as politician_name')
+            $data = Bill::select('bills.id', 'bills.introduced', 'bills.short_name', 'bills.name', 'bills.number', 'bills.is_government_bill', 'bills.session', 'bills.bill_url', 'politicians.name as politician_name')
                 ->leftJoin('politicians', 'bills.politician', '=', 'politicians.politician_url')
                 ->where('bills.session', '45-1')
                 ->where('bills.number', $number)
@@ -102,6 +102,19 @@ class ChatController extends Controller
         if($this->chat_system == 'open_ai'){
             $open_ai = new OpenAiController();
             return $open_ai->generateIssueResponse($validated);
+        }
+    }
+
+    public function aceChat(Request $request){
+        $validated = $request->validate([
+            'messages' => 'required|array',
+            'messages.*.role' => 'required|string|in:user,assistant,system',
+            'messages.*.content' => 'required|string',
+        ]);
+
+        if($this->chat_system == 'open_ai'){
+            $open_ai = new OpenAiController();
+            return $open_ai->generateAceResponse($validated);
         }
     }
 }

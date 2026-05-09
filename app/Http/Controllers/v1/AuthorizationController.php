@@ -6,6 +6,7 @@ use App\Helper\OpenParliamentClass;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\ForgotPasswordRequest;
 use App\Http\Requests\LoginRequest;
+use App\Http\Requests\OnboardingRequest;
 use App\Http\Requests\RegisterRequest;
 use App\Http\Requests\GoogleLoginRequest;
 use App\Http\Requests\FacebookLoginRequest;
@@ -37,6 +38,10 @@ class AuthorizationController extends Controller
 
     public function forgot_password(ForgotPasswordRequest $request){
         return $this->authorization_class->forgot_password($request);
+    }
+
+    public function onboard(OnboardingRequest $request){
+        return $this->authorization_class->onboard($request);
     }
 
     public function googleLogin(GoogleLoginRequest $request)

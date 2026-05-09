@@ -5,7 +5,9 @@ namespace App\Service\v1\Auth;
 use App\Http\Controllers\v1\MP\RepresentativeController;
 use App\Http\Requests\ForgotPasswordRequest;
 use App\Http\Requests\LoginRequest;
+use App\Http\Requests\OnboardingRequest;
 use App\Http\Requests\RegisterRequest;
+use App\Models\Organization;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
@@ -18,7 +20,7 @@ class AuthorizationClass
      */
     public function __construct()
     {
-        //
+
     }
 
     public function login(LoginRequest $login_request){
@@ -130,5 +132,43 @@ class AuthorizationClass
             'success' => true,
             'message' => 'password set successfully'
         ]);
+    }
+
+    public function onboard(OnboardingRequest $onboarding_request){
+        try {
+            $data = $onboarding_request->validated();
+            $user = Auth::user();
+
+            $organization = Organization::updateOrCreate(
+                ['user_id' => $user->id],
+                [
+                    'name' => $data['name'],
+                    'company_size' => $data['company_size'],
+                    'country' => $data['country'],
+                    'industries' => $data['industries'],
+                    'use_cases' => $data['use_cases'],
+                    'policy_interests' => $data['policy_interests'],
+                    'alert_preference' => $data['alert_preference'],
+                ]
+            );
+
+            $user->update([
+                'onboarding_completed' => true,
+                'organization_id' => $organization->id
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Onboarding completed successfully',
+                'user' => $user->load('organization'),
+            ]);
+        } catch (\Exception $e) {
+            logger('Onboarding error: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Onboarding failed',
+                'error' => $e->getMessage()
+            ], 500);
+        }
     }
 }

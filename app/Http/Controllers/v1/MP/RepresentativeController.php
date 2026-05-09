@@ -95,8 +95,7 @@ class RepresentativeController extends Controller
         $search = request('search');
 
         $data = Cache::remember("search_representative_by_{$search}", now()->addDays(7), function () use ($search) {
-            return Politicians::select('name', 'province_name', 'id')
-                ->where('is_former',false)
+            return Politicians::where('is_former',false)
                 ->where(function ($query) use ($search) {
                     $query->where('name', 'like', '%' . $search . '%');
                 })
