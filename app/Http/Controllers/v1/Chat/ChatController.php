@@ -5,9 +5,12 @@ namespace App\Http\Controllers\v1\Chat;
 use App\Http\Controllers\Controller;
 use App\Models\Bill;
 use App\Models\RepresentativeIssue;
+use App\Models\AceChatSession;
+use App\Models\AceChatMessage;
 use App\Service\v1\BillClass;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Auth;
 
 class ChatController extends Controller
 {
@@ -140,11 +143,64 @@ class ChatController extends Controller
             'messages' => 'required|array',
             'messages.*.role' => 'required|string|in:user,assistant,system',
             'messages.*.content' => 'required|string',
+            'session_id' => 'nullable|integer'
         ]);
+
+        $sessionId = $validated['session_id'] ?? null;
+        $messages = $validated['messages'];
+        $lastMessage = end($messages);
 
         if($this->chat_system == 'open_ai'){
             $open_ai = new OpenAiController();
-            return $open_ai->generateAceResponse($validated);
+            $response = $open_ai->generateAceResponse($validated);
+            
+            // If the response is a JsonResponse, we can extract data
+            if (method_exists($response, 'getData')) {
+                $responseData = $response->getData(true);
+                $reply = $responseData['reply'] ?? null;
+
+                // Save to history if user is authenticated and we have a reply
+                if (Auth::check() && $reply) {
+                    if (!$sessionId) {
+                        $session = AceChatSession::create([
+                            'user_id' => Auth::id(),
+                            'title' => substr($lastMessage['content'], 0, 50) . (strlen($lastMessage['content']) > 50 ? '...' : '')
+                        ]);
+                        $sessionId = $session->id;
+                    } else {
+                        $session = AceChatSession::find($sessionId);
+                        if ($session) {
+                            $session->touch(); // Update updated_at
+                        } else {
+                            // If session_id was provided but not found, create a new one
+                            $session = AceChatSession::create([
+                                'user_id' => Auth::id(),
+                                'title' => substr($lastMessage['content'], 0, 50) . (strlen($lastMessage['content']) > 50 ? '...' : '')
+                            ]);
+                            $sessionId = $session->id;
+                        }
+                    }
+
+                    // Save user message
+                    AceChatMessage::create([
+                        'ace_chat_session_id' => $sessionId,
+                        'role' => 'user',
+                        'content' => $lastMessage['content']
+                    ]);
+
+                    // Save assistant message
+                    AceChatMessage::create([
+                        'ace_chat_session_id' => $sessionId,
+                        'role' => 'assistant',
+                        'content' => $reply
+                    ]);
+                    
+                    $responseData['session_id'] = $sessionId;
+                    return response()->json($responseData);
+                }
+            }
+
+            return $response;
         }
     }
 }
