@@ -5,6 +5,7 @@ use App\Http\Controllers\v1\Bills\BillController;
 use App\Http\Controllers\v1\Bills\CommentController;
 use App\Http\Controllers\v1\Bills\DashboardController;
 use App\Http\Controllers\v1\Chat\ChatController;
+use App\Http\Controllers\v1\Chat\AceChatHistoryController;
 use App\Http\Controllers\v1\Issue\RepresentativeIssueController;
 use App\Http\Controllers\v1\MP\RepresentativeController;
 use App\Http\Controllers\v1\NotificationController;
@@ -101,6 +102,13 @@ Route::prefix('app/v1')->group(function () {
         Route::post('/bill-chat-link', [ChatController::class, 'billChatLink']);
         Route::post('/ace', [ChatController::class, 'aceChat']);
         Route::post('/issue-chat', [ChatController::class, 'issueChat']);
+
+        // Ace Chat History
+        Route::prefix('ace')->group(function () {
+            Route::get('/sessions', [AceChatHistoryController::class, 'index']);
+            Route::get('/sessions/{id}', [AceChatHistoryController::class, 'show']);
+            Route::delete('/sessions/{id}', [AceChatHistoryController::class, 'destroy']);
+        });
     });
 
     Route::prefix('link')->group(function () {
