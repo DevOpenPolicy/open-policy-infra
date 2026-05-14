@@ -25,7 +25,7 @@ class BillController extends Controller
     public function getBills(){
         $search = request('search');
         $bill_search = request('bill_search');
-        $session_search = request('session_search')?: '45-1';
+        $session_search = request('session_search');
 
 
         
@@ -39,7 +39,9 @@ class BillController extends Controller
                         ->orWhere('bills.number', 'like', "%{$search}%")
                         ->orWhere('politicians.name', 'like', "%{$search}%");
                 })
-                ->where('bills.session', $session_search)
+                ->when($session_search && $session_search !== 'all', function ($query) use ($session_search) {
+                    $query->where('bills.session', $session_search);
+                })
                 ->whereNotIn('bills.number', ['c-1', 's-1'])
                 ->when(isset($bill_search), function ($query) use ($bill_search) {
                     $query->where('bills.is_government_bill', $bill_search);
