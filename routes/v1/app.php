@@ -101,6 +101,8 @@ Route::prefix('app/v1')->group(function () {
         Route::post('/bill-chat', [ChatController::class, 'billChat']);
         Route::post('/bill-chat-link', [ChatController::class, 'billChatLink']);
         Route::post('/ace', [ChatController::class, 'aceChat']);
+        Route::post('/ai-search', [ChatController::class, 'aiSearch']);
+        Route::post('/ai-search-members', [ChatController::class, 'aiSearchMembers']);
         Route::post('/issue-chat', [ChatController::class, 'issueChat']);
 
         // Ace Chat History

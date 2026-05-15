@@ -207,4 +207,119 @@ class ChatGptClass
 
         return $body['choices'][0]['message']['content'] ?? 'No response generated.';
     }
+
+    public function extractSearchTerms(string $query): array
+    {
+        $systemMessage = "You are a policy research assistant. Extract the most relevant search keywords (3-5 words) from the user's natural language query about bills or legislation. Return only the keywords separated by spaces.";
+
+        $response = $this->client->post('https://api.openai.com/v1/chat/completions', [
+            'headers' => [
+                'Authorization' => 'Bearer ' . $this->apiKey,
+                'Content-Type' => 'application/json',
+            ],
+            'json' => [
+                'model' => 'gpt-3.5-turbo',
+                'messages' => [
+                    ['role' => 'system', 'content' => $systemMessage],
+                    ['role' => 'user', 'content' => $query],
+                ],
+                'temperature' => 0.3,
+                'max_tokens' => 50,
+            ]
+        ]);
+
+        $body = json_decode($response->getBody(), true);
+        $content = $body['choices'][0]['message']['content'] ?? '';
+        
+        return array_filter(explode(' ', $content));
+    }
+
+    public function generateSearchResponse(string $query, $bills): string
+    {
+        $systemMessage = "You are Ace, an intelligent policy research companion. A user asked: '$query'. Based on their query, I found some bills. Briefly explain how these bills relate to their interest and invite them to explore further. Be concise.";
+        
+        $billContext = "";
+        foreach ($bills as $bill) {
+            $number = is_array($bill) ? ($bill['number'] ?? 'N/A') : ($bill->number ?? 'N/A');
+            $name = is_array($bill) ? ($bill['short_name'] ?? $bill['name'] ?? 'Untitled') : ($bill->short_name ?? $bill->name ?? 'Untitled');
+            $billContext .= "- {$number}: {$name}\n";
+        }
+
+        $response = $this->client->post('https://api.openai.com/v1/chat/completions', [
+            'headers' => [
+                'Authorization' => 'Bearer ' . $this->apiKey,
+                'Content-Type' => 'application/json',
+            ],
+            'json' => [
+                'model' => 'gpt-3.5-turbo',
+                'messages' => [
+                    ['role' => 'system', 'content' => $systemMessage],
+                    ['role' => 'user', 'content' => "Found bills:\n$billContext"],
+                ],
+                'temperature' => 0.7,
+                'max_tokens' => 300,
+            ]
+        ]);
+
+        $body = json_decode($response->getBody(), true);
+        return $body['choices'][0]['message']['content'] ?? 'Here are the bills I found for you.';
+    }
+
+    public function extractMemberSearchTerms(string $query): array
+    {
+        $systemMessage = "You are a policy research assistant. Extract relevant search keywords (3-5 words) from the user's natural language query about Canadian Members of Parliament. Focus on names, parties, and provinces. Return only the keywords separated by spaces.";
+
+        $response = $this->client->post('https://api.openai.com/v1/chat/completions', [
+            'headers' => [
+                'Authorization' => 'Bearer ' . $this->apiKey,
+                'Content-Type' => 'application/json',
+            ],
+            'json' => [
+                'model' => 'gpt-3.5-turbo',
+                'messages' => [
+                    ['role' => 'system', 'content' => $systemMessage],
+                    ['role' => 'user', 'content' => $query],
+                ],
+                'temperature' => 0.3,
+                'max_tokens' => 50,
+            ]
+        ]);
+
+        $body = json_decode($response->getBody(), true);
+        $content = $body['choices'][0]['message']['content'] ?? '';
+        
+        return array_filter(explode(' ', $content));
+    }
+
+    public function generateMemberSearchResponse(string $query, $members): string
+    {
+        $systemMessage = "You are Ace, an intelligent policy research companion. A user asked about MPs: '$query'. Based on their query, I found some Members of Parliament. Briefly explain how these members relate to their interest. Be concise and professional.";
+        
+        $memberContext = "";
+        foreach ($members as $member) {
+            $name = is_array($member) ? ($member['name'] ?? 'N/A') : ($member->name ?? 'N/A');
+            $party = is_array($member) ? ($member['party_name'] ?? 'N/A') : ($member->party_name ?? 'N/A');
+            $province = is_array($member) ? ($member['province_name'] ?? 'N/A') : ($member->province_name ?? 'N/A');
+            $memberContext .= "- {$name} ({$party}, {$province})\n";
+        }
+
+        $response = $this->client->post('https://api.openai.com/v1/chat/completions', [
+            'headers' => [
+                'Authorization' => 'Bearer ' . $this->apiKey,
+                'Content-Type' => 'application/json',
+            ],
+            'json' => [
+                'model' => 'gpt-3.5-turbo',
+                'messages' => [
+                    ['role' => 'system', 'content' => $systemMessage],
+                    ['role' => 'user', 'content' => "Context:\n$memberContext\n\nQuery: $query"],
+                ],
+                'temperature' => 0.7,
+                'max_tokens' => 300,
+            ]
+        ]);
+
+        $body = json_decode($response->getBody(), true);
+        return $body['choices'][0]['message']['content'] ?? 'I found some members that might interest you.';
+    }
 }
