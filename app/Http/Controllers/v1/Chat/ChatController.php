@@ -4,6 +4,7 @@ namespace App\Http\Controllers\v1\Chat;
 
 use App\Http\Controllers\Controller;
 use App\Models\Bill;
+use App\Models\Politicians;
 use App\Models\RepresentativeIssue;
 use App\Models\AceChatSession;
 use App\Models\AceChatMessage;
@@ -201,6 +202,94 @@ class ChatController extends Controller
             }
 
             return $response;
+        }
+    }
+
+    public function aiSearch(Request $request)
+    {
+        $validated = $request->validate([
+            'messages' => 'required|array',
+            'messages.*.role' => 'required|string|in:user,assistant,system',
+            'messages.*.content' => 'required|string',
+        ]);
+
+        $lastMessage = end($validated['messages']);
+        $query = $lastMessage['content'];
+
+        try {
+            $chatGpt = new \App\Service\v1\ChatGptClass();
+            $keywords = $chatGpt->extractSearchTerms($query);
+
+            $bills = Bill::select('bills.id', 'bills.introduced', 'bills.short_name', 'bills.name', 'bills.number', 'bills.is_government_bill', 'bills.session', 'politicians.name as politician_name')
+                ->leftJoin('politicians', 'bills.politician', '=', 'politicians.politician_url')
+                ->where(function ($q) use ($keywords) {
+                    foreach ($keywords as $keyword) {
+                        $q->orWhere('bills.name', 'like', "%{$keyword}%")
+                          ->orWhere('bills.short_name', 'like', "%{$keyword}%")
+                          ->orWhere('bills.number', 'like', "%{$keyword}%");
+                    }
+                })
+                ->where('bills.session', '45-1') // Defaulting to current session
+                ->limit(5)
+                ->get();
+
+            $reply = $chatGpt->generateSearchResponse($query, $bills);
+
+            return response()->json([
+                'success' => true,
+                'data' => [
+                    'reply' => $reply,
+                    'bills' => $bills
+                ]
+            ]);
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('AI Search Error: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'An error occurred during the AI search. Please try again later.'
+            ], 500);
+        }
+    }
+
+    public function aiSearchMembers(Request $request)
+    {
+        $validated = $request->validate([
+            'messages' => 'required|array',
+        ]);
+
+        $lastMessage = end($validated['messages']);
+        $query = $lastMessage['content'];
+
+        try {
+            $chatGpt = new \App\Service\v1\ChatGptClass();
+            $keywords = $chatGpt->extractMemberSearchTerms($query);
+
+            $members = Politicians::select('politicians.id', 'politicians.name', 'politicians.party_name', 'politicians.province_name', 'politicians.politician_image')
+                ->where(function ($q) use ($keywords) {
+                    foreach ($keywords as $keyword) {
+                        $q->orWhere('politicians.name', 'like', "%{$keyword}%")
+                          ->orWhere('politicians.party_name', 'like', "%{$keyword}%")
+                          ->orWhere('politicians.province_name', 'like', "%{$keyword}%");
+                    }
+                })
+                ->limit(5)
+                ->get();
+
+            $reply = $chatGpt->generateMemberSearchResponse($query, $members);
+
+            return response()->json([
+                'success' => true,
+                'data' => [
+                    'reply' => $reply,
+                    'members' => $members
+                ]
+            ]);
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('AI Member Search Error: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'An error occurred during the AI search. Please try again later.'
+            ], 500);
         }
     }
 }
