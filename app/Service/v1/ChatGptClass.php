@@ -260,6 +260,7 @@ class ChatGptClass
                 'max_tokens' => 300,
             ]
         ]);
+        // change
 
         $body = json_decode($response->getBody(), true);
         return $body['choices'][0]['message']['content'] ?? 'Here are the bills I found for you.';
